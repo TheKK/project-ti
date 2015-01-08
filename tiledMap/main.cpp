@@ -129,6 +129,9 @@ update()
 {
 	camera.update();
 
+	if (controller.ifButtonPressed(BUTTON_START))
+		appIsRunning = false;
+
 	controller.stateClear();
 }
 

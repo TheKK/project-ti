@@ -1,6 +1,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <map>
+
 #include <SDL2/SDL.h>
 
 enum Buttons {
@@ -8,6 +10,8 @@ enum Buttons {
 	BUTTON_DOWN,
 	BUTTON_LEFT,
 	BUTTON_RIGHT,
+
+	BUTTON_START,
 
 	BUTTON_COUNT
 };
@@ -35,6 +39,11 @@ private:
 	enum ButtonStates buttonState_[BUTTON_COUNT] = {BUTTON_STATE_RELEASED};
 	bool buttonPressed_[BUTTON_COUNT] = {false};
 	bool buttonReleased_[BUTTON_COUNT] = {false};
+
+	std::map<int, SDL_Joystick*> joysticks_;
+
+	void addJoystick_(int joystickId);
+	void removeJoystick_(int joystickId);
 };
 
 #endif /* CONTROLLER_H */
