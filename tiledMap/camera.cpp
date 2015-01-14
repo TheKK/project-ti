@@ -1,5 +1,7 @@
 #include <algorithm>
 
+#include "player.h"
+
 #include "camera.h"
 
 Camera::Camera()
@@ -35,21 +37,22 @@ Camera::setup(SDL_Renderer* renderer,
 void
 Camera::update()
 {
-	int dx = 0, dy = 0;
-
-	if (!targetRect_)
+	if (!target_)
 		return;
 
-	if (targetRect_->x < viewRect_.x + deadZoneRect_.x)
-		dx = targetRect_->x - (viewRect_.x + deadZoneRect_.x);
-	else if (targetRect_->x + targetRect_->w > viewRect_.x + deadZoneRect_.x + deadZoneRect_.w)
-		dx = (targetRect_->x + targetRect_->w) -
+	int dx = 0, dy = 0;
+	SDL_Rect targetRect_ = target_->rect();
+
+	if (targetRect_.x < viewRect_.x + deadZoneRect_.x)
+		dx = targetRect_.x - (viewRect_.x + deadZoneRect_.x);
+	else if (targetRect_.x + targetRect_.w > viewRect_.x + deadZoneRect_.x + deadZoneRect_.w)
+		dx = (targetRect_.x + targetRect_.w) -
 			(viewRect_.x + deadZoneRect_.x + deadZoneRect_.w);
 
-	if (targetRect_->y < viewRect_.y + deadZoneRect_.y)
-		dy = targetRect_->y - (viewRect_.y + deadZoneRect_.y);
-	else if (targetRect_->y + targetRect_->h > viewRect_.y + deadZoneRect_.y + deadZoneRect_.h)
-		dy = (targetRect_->y + targetRect_->h) -
+	if (targetRect_.y < viewRect_.y + deadZoneRect_.y)
+		dy = targetRect_.y - (viewRect_.y + deadZoneRect_.y);
+	else if (targetRect_.y + targetRect_.h > viewRect_.y + deadZoneRect_.y + deadZoneRect_.h)
+		dy = (targetRect_.y + targetRect_.h) -
 			(viewRect_.y + deadZoneRect_.y + deadZoneRect_.h);
 
 	viewRect_.x += dx;
@@ -68,8 +71,8 @@ Camera::getViewRect() const
 }
 
 void
-Camera::lookAt(const SDL_Rect* target)
+Camera::lookAt(const Player& target)
 {
-	targetRect_ = target;
+	target_ = &target;
 }
 

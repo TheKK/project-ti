@@ -1,22 +1,28 @@
+#include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <jsoncpp/json/json.h>
 #include <stdexcept>
 
 #include "map.h"
 #include "sprite.h"
 #include "controller.h"
 #include "camera.h"
+#include "player.h"
 
-static SDL_Window* mainWindow = nullptr;
-static SDL_Renderer* mainRenderer = nullptr;
-static bool appIsRunning = true;
+namespace
+{
+	SDL_Window* mainWindow = nullptr;
+	SDL_Renderer* mainRenderer = nullptr;
+	bool appIsRunning = true;
 
-static MapTileLayer backLayer;
-static MapTileLayer foreLayer;;
-static Camera camera;
+	MapTileLayer backLayer;
+	MapTileLayer foreLayer;;
+	Camera camera;
 
-static Controller controller;
+	Controller controller;
+
+	Player player;
+}
 
 void
 reloadMap()
@@ -26,14 +32,10 @@ reloadMap()
 	mapLoader.load("map.json");
 
 	backLayer.cleanUp();
-	backLayer.load(mainRenderer,
-			  mapLoader.getTileLayer("layer_one"),
-			  mapLoader.getTileSets());
+	backLayer.load(mainRenderer, mapLoader, "layer_one");
 
 	foreLayer.cleanUp();
-	foreLayer.load(mainRenderer,
-		       mapLoader.getTileLayer("layer_two"),
-		       mapLoader.getTileSets());
+	foreLayer.load(mainRenderer, mapLoader, "layer_two");
 }
 
 int
@@ -67,14 +69,10 @@ init()
 	mapLoader.load("map.json");
 
 	backLayer.cleanUp();
-	backLayer.load(mainRenderer,
-		       mapLoader.getTileLayer("layer_one"),
-		       mapLoader.getTileSets());
+	backLayer.load(mainRenderer, mapLoader, "layer_one");
 
 	foreLayer.cleanUp();
-	foreLayer.load(mainRenderer,
-		       mapLoader.getTileLayer("layer_two"),
-		       mapLoader.getTileSets());
+	foreLayer.load(mainRenderer, mapLoader, "layer_two");
 
 	camera.setup(mainRenderer,
 		     backLayer.getMapWidth() * backLayer.getTileWidth(),
@@ -82,7 +80,7 @@ init()
 		     200, 200);
 		     //150, 150);
 
-	//camera.lookAt(&mouse);
+	//camera.lookAt(player);
 
 	return 0;
 }
@@ -127,6 +125,7 @@ eventHandler(const SDL_Event* event)
 void
 update()
 {
+	player.update(controller, backLayer);
 	camera.update();
 
 	if (controller.ifButtonPressed(BUTTON_START))
@@ -142,6 +141,7 @@ render()
 	SDL_RenderClear(mainRenderer);
 	{
 		backLayer.render(mainRenderer, camera);
+		player.render(mainRenderer, camera);
 		foreLayer.render(mainRenderer, camera);
 	}
 	SDL_RenderPresent(mainRenderer);

@@ -45,6 +45,22 @@ Controller::eventHandler(const SDL_Event* event)
 			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_RIGHT] = true;
 			break;
+		case SDL_SCANCODE_Z:
+			buttonState_[BUTTON_B] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_B] = true;
+			break;
+		case SDL_SCANCODE_X:
+			buttonState_[BUTTON_A] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_A] = true;
+			break;
+		case SDL_SCANCODE_A:
+			buttonState_[BUTTON_Y] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_Y] = true;
+			break;
+		case SDL_SCANCODE_S:
+			buttonState_[BUTTON_X] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_X] = true;
+			break;
 		default:
 			break;
 		}
@@ -71,25 +87,117 @@ Controller::eventHandler(const SDL_Event* event)
 			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_RELEASED;
 			buttonReleased_[BUTTON_RIGHT] = true;
 			break;
+		case SDL_SCANCODE_Z:
+			buttonState_[BUTTON_B] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_B] = true;
+			break;
+		case SDL_SCANCODE_X:
+			buttonState_[BUTTON_A] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_A] = true;
+			break;
+		case SDL_SCANCODE_A:
+			buttonState_[BUTTON_Y] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_Y] = true;
+			break;
+		case SDL_SCANCODE_S:
+			buttonState_[BUTTON_X] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_X] = true;
+			break;
 		default:
 			break;
 		}
 		break;
 
 	case SDL_JOYBUTTONDOWN:
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-			    "Joystick button %d pressed",
-			    event->jbutton.button);
-		if (event->jbutton.button == 9) {
+		switch (event->jbutton.button) {
+		case 0:
+			buttonState_[BUTTON_X] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_X] = true;
+			break;
+		case 1:
+			buttonState_[BUTTON_A] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_A] = true;
+			break;
+		case 2:
+			buttonState_[BUTTON_B] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_B] = true;
+			break;
+		case 3:
+			buttonState_[BUTTON_Y] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_Y] = true;
+			break;
+		case 8:
+			buttonState_[BUTTON_SELECT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_SELECT] = true;
+			break;
+		case 9:
 			buttonState_[BUTTON_START] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_START] = true;
+			break;
+		default:
+			break;
 		}
 		break;
 
 	case SDL_JOYBUTTONUP:
-		if (event->jbutton.button == 9) {
+		switch (event->jbutton.button) {
+		case 0:
+			buttonState_[BUTTON_X] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_X] = true;
+			break;
+		case 1:
+			buttonState_[BUTTON_A] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_A] = true;
+			break;
+		case 2:
+			buttonState_[BUTTON_B] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_B] = true;
+			break;
+		case 3:
+			buttonState_[BUTTON_Y] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_Y] = true;
+			break;
+		case 8:
+			buttonState_[BUTTON_SELECT] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_SELECT] = true;
+			break;
+		case 9:
 			buttonState_[BUTTON_START] = BUTTON_STATE_RELEASED;
 			buttonReleased_[BUTTON_START] = true;
+			break;
+		default:
+			break;
+		}
+		break;
+
+	case SDL_JOYHATMOTION:
+		switch (event->jhat.value) {
+		case SDL_HAT_UP:
+			buttonState_[BUTTON_UP] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_UP] = true;
+			break;
+		case SDL_HAT_DOWN:
+			buttonState_[BUTTON_DOWN] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_DOWN] = true;
+			break;
+		case SDL_HAT_LEFT:
+			buttonState_[BUTTON_LEFT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_LEFT] = true;
+			break;
+		case SDL_HAT_RIGHT:
+			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_RIGHT] = true;
+			break;
+		case SDL_HAT_CENTERED:
+			buttonState_[BUTTON_UP] = BUTTON_STATE_RELEASED;
+			buttonState_[BUTTON_DOWN] = BUTTON_STATE_RELEASED;
+			buttonState_[BUTTON_LEFT] = BUTTON_STATE_RELEASED;
+			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_UP] = true;
+			buttonReleased_[BUTTON_DOWN] = true;
+			buttonReleased_[BUTTON_LEFT] = true;
+			buttonReleased_[BUTTON_RIGHT] = true;
+			break;
 		}
 		break;
 
@@ -134,15 +242,17 @@ Controller::ifButtonReleased(enum Buttons which) const
 void
 Controller::addJoystick_(int joystickId)
 {
-	SDL_Joystick* joystick;
+	SDL_Joystick* joystick = SDL_JoystickOpen(joystickId);
 
-	joystick = SDL_JoystickOpen(joystickId);
 	if (!joystick) {
 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 			    "Unable to open joystick: %s",
 			    SDL_GetError());
 		return;
 	}
+
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+		    "Joystick %s inserted", SDL_JoystickName(joystick));
 
 	joysticks_[joystickId] = joystick;
 

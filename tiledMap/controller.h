@@ -5,18 +5,26 @@
 
 #include <SDL2/SDL.h>
 
-enum Buttons {
+enum Buttons
+{
 	BUTTON_UP = 0x00,
 	BUTTON_DOWN,
 	BUTTON_LEFT,
 	BUTTON_RIGHT,
 
+	BUTTON_A,
+	BUTTON_B,
+	BUTTON_X,
+	BUTTON_Y,
+
 	BUTTON_START,
+	BUTTON_SELECT,
 
 	BUTTON_COUNT
 };
 
-enum ButtonStates {
+enum ButtonStates
+{
 	BUTTON_STATE_PRESSED = 0x00,
 	BUTTON_STATE_RELEASED,
 

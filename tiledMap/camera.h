@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 
+class Player;
+
 class Camera
 {
 public:
@@ -17,13 +19,13 @@ public:
 
 	const SDL_Rect& getViewRect() const;
 
-	void lookAt(const SDL_Rect* target);
+	void lookAt(const Player& target);
 private:
 	SDL_Rect worldRect_ = {0};
 	SDL_Rect viewRect_ = {0};
 	SDL_Rect deadZoneRect_ = {0};
 
-	const SDL_Rect* targetRect_ = nullptr;
+	const Player* target_ = nullptr;
 };
 
 #endif /* CAMERA_H */

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <SDL2/SDL.h>
 
 class Camera;
@@ -21,8 +21,8 @@ public:
 
 	void load(const std::string& filePath);
 
-	const Json::Value& getTileLayer(const std::string& layerName);
-	const Json::Value& getTileSets();
+	const Json::Value& getLayer(const std::string& layerName) const;
+	const Json::Value& getTileSets() const;
 private:
 	Json::Value mapData_;
 };
@@ -31,14 +31,12 @@ class MapTileLayer
 {
 public:
 	MapTileLayer();
-	MapTileLayer(SDL_Renderer* renderer,
-		     const Json::Value& layer,
-		     const Json::Value& tileSets);
+	MapTileLayer(SDL_Renderer* renderer, const MapLoader& mapLoader,
+		     const std::string& layerName);
 	~MapTileLayer();
 
-	void load(SDL_Renderer* renderer,
-		  const Json::Value& layer,
-		  const Json::Value& tileSets);
+	void load(SDL_Renderer* renderer, const MapLoader& mapLoader,
+		  const std::string& layerName);
 	void cleanUp();
 
 	void update();

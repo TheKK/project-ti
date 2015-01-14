@@ -80,7 +80,7 @@ MapLoader::load(const std::string& filePath)
 }
 
 const Json::Value&
-MapLoader::getTileLayer(const std::string& layerName)
+MapLoader::getLayer(const std::string& layerName) const
 {
 	if (mapData_["layers"].isNull())
 		throw std::runtime_error(
@@ -95,7 +95,7 @@ MapLoader::getTileLayer(const std::string& layerName)
 }
 
 const Json::Value&
-MapLoader::getTileSets()
+MapLoader::getTileSets() const
 {
 	const Json::Value& tileSetsToReturn = mapData_["tilesets"];
 
@@ -110,11 +110,10 @@ MapTileLayer::MapTileLayer()
 {
 }
 
-MapTileLayer::MapTileLayer(SDL_Renderer* renderer,
-			   const Json::Value& layer,
-			   const Json::Value& tileSets)
+MapTileLayer::MapTileLayer(SDL_Renderer* renderer, const MapLoader& mapLoader,
+			   const std::string& layerName)
 {
-	load(renderer, layer, tileSets);
+	load(renderer, mapLoader, layerName);
 }
 
 MapTileLayer::~MapTileLayer()
@@ -123,12 +122,12 @@ MapTileLayer::~MapTileLayer()
 }
 
 void
-MapTileLayer::load(SDL_Renderer* renderer, const Json::Value& layer,
-		   const Json::Value& tileSets)
+MapTileLayer::load(SDL_Renderer* renderer, const MapLoader& mapLoader,
+		   const std::string& layerName)
 {
-	layer_ = layer;
+	layer_ = mapLoader.getLayer(layerName);
 
-	for (auto& tileSet : tileSets) {
+	for (auto& tileSet : mapLoader.getTileSets()) {
 		std::string imageName = tileSet["image"].asString();
 
 		tileSets_.push_back(tileSet);
