@@ -23,6 +23,10 @@ private:
 	float velX_, velY_;
 	float accX_, accY_;
 
+	void updateInput_(const Controller& controller);
+	void updateX_(const MapTileLayer& tileLayer);
+	void updateY_(const MapTileLayer& tileLayer);
+
 	void testCollideWithTiles_(const MapTileLayer& tileLayer);
 };
 

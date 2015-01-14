@@ -40,20 +40,34 @@ Camera::update()
 	if (!target_)
 		return;
 
-	int dx = 0, dy = 0;
+	int deadZoneLeft, deadZoneRight, deadZoneTop, deadZoneBottom;
+	int targetLeft, targetRight, targetTop, targetBottom;
+	int dx, dy;
 	SDL_Rect targetRect_ = target_->posRectOnMap();
 
-	if (targetRect_.x < viewRect_.x + deadZoneRect_.x)
-		dx = targetRect_.x - (viewRect_.x + deadZoneRect_.x);
-	else if (targetRect_.x + targetRect_.w > viewRect_.x + deadZoneRect_.x + deadZoneRect_.w)
-		dx = (targetRect_.x + targetRect_.w) -
-			(viewRect_.x + deadZoneRect_.x + deadZoneRect_.w);
+	deadZoneLeft = viewRect_.x + deadZoneRect_.x;
+	deadZoneRight = viewRect_.x + deadZoneRect_.x + deadZoneRect_.w;
+	deadZoneTop = viewRect_.y + deadZoneRect_.y;
+	deadZoneBottom = viewRect_.y + deadZoneRect_.y + deadZoneRect_.h;
 
-	if (targetRect_.y < viewRect_.y + deadZoneRect_.y)
-		dy = targetRect_.y - (viewRect_.y + deadZoneRect_.y);
-	else if (targetRect_.y + targetRect_.h > viewRect_.y + deadZoneRect_.y + deadZoneRect_.h)
-		dy = (targetRect_.y + targetRect_.h) -
-			(viewRect_.y + deadZoneRect_.y + deadZoneRect_.h);
+	targetLeft = targetRect_.x;
+	targetRight = targetRect_.x + targetRect_.w;
+	targetTop = targetRect_.y;
+	targetBottom = targetRect_.y + targetRect_.h;
+
+	if (targetLeft < deadZoneLeft)
+		dx = targetLeft - deadZoneLeft;
+	else if (targetRight > deadZoneRight)
+		dx = targetRight - deadZoneRight;
+	else
+		dx = 0;
+
+	if (targetTop < deadZoneTop)
+		dy = targetTop - deadZoneTop;
+	else if (targetBottom > deadZoneBottom)
+		dy = targetBottom - deadZoneBottom;
+	else
+		dy = 0;
 
 	viewRect_.x += dx;
 	viewRect_.y += dy;

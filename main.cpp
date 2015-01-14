@@ -78,10 +78,10 @@ init()
 	camera.setup(mainRenderer,
 		     backLayer.getMapWidth() * backLayer.getTileWidth(),
 		     backLayer.getMapHeight() * backLayer.getTileHeight(),
-		     200, 200);
-		     //150, 150);
+		     //200, 200);
+		     100, 100);
 
-	//camera.lookAt(player);
+	camera.lookAt(player);
 
 	return 0;
 }
@@ -140,11 +140,21 @@ render()
 {
 	SDL_SetRenderDrawColor(mainRenderer, 0x33, 0x33, 0x33, 0xff);
 	SDL_RenderClear(mainRenderer);
-	{
-		backLayer.render(mainRenderer, camera);
-		player.render(mainRenderer, camera);
-		foreLayer.render(mainRenderer, camera);
-	}
+
+	SDL_Rect viewport;
+
+	viewport.x = 0;
+	viewport.y = 0;
+	viewport.w = backLayer.getTileWidth() * backLayer.getMapWidth();
+	viewport.h = backLayer.getTileHeight() * backLayer.getMapHeight();
+
+	SDL_SetRenderDrawColor(mainRenderer, 0x44, 0x33, 0x33, 0xff);
+	SDL_RenderFillRect(mainRenderer, &viewport);
+
+	backLayer.render(mainRenderer, camera);
+	player.render(mainRenderer, camera);
+	foreLayer.render(mainRenderer, camera);
+
 	SDL_RenderPresent(mainRenderer);
 }
 

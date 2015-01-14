@@ -45,7 +45,7 @@ public:
 	void update();
 	void render(SDL_Renderer* SDL_Renderer, const Camera& camera);
 
-	std::vector<SDL_Rect> getCollidedTiles(SDL_Rect rect) const;
+	std::vector<SDL_Rect> getCollidedTiles(const SDL_Rect& rect) const;
 
 	int getMapWidth() const;
 	int getMapHeight() const;

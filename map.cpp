@@ -145,7 +145,7 @@ MapTileLayer::load(SDL_Renderer* renderer, const MapLoader& mapLoader,
 	tileHeight_ = mapLoader.getTileheight();
 
 	mapWidth_ = layer_["width"].asInt();
-	mapWidth_ = layer_["height"].asInt();
+	mapHeight_ = layer_["height"].asInt();
 
 	for (auto& tileSet : mapLoader.getTileSets()) {
 		std::string imageName = tileSet["image"].asString();
@@ -255,7 +255,7 @@ MapTileLayer::render(SDL_Renderer* renderer, const Camera& camera)
 }
 
 std::vector<SDL_Rect>
-MapTileLayer::getCollidedTiles(SDL_Rect rect) const
+MapTileLayer::getCollidedTiles(const SDL_Rect& rect) const
 {
 	std::vector<SDL_Rect> tilesToReturn;
 	int leftBorder, rightBorder, topBorder, bottomBorder;
@@ -267,7 +267,10 @@ MapTileLayer::getCollidedTiles(SDL_Rect rect) const
 
 	for (int row = topBorder; row <= bottomBorder; ++row) {
 		for (int col = leftBorder; col <= rightBorder; ++col) {
-			/* TODO Return only solid tile */
+			/* TODO
+			 * Now return only solid tile, maybe not the
+			 * best way
+			 * */
 			if (layer_["data"][row * mapWidth_ + col] == 0)
 				continue;
 
