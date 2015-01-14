@@ -266,7 +266,7 @@ MapTileLayer::getCollidedTiles(SDL_Rect rect) const
 	bottomBorder = std::ceil((rect.y + rect.h) / tileHeight_);
 
 	for (int row = topBorder; row <= bottomBorder; ++row) {
-		for (int col = leftBorder; col <= leftBorder; ++col) {
+		for (int col = leftBorder; col <= rightBorder; ++col) {
 			/* TODO Return only solid tile */
 			if (layer_["data"][row * mapWidth_ + col] == 0)
 				continue;
