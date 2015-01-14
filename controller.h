@@ -43,10 +43,15 @@ public:
 	enum ButtonStates getButtonState(enum Buttons which) const;
 	bool ifButtonPressed(enum Buttons which) const;
 	bool ifButtonReleased(enum Buttons which) const;
+
+	int16_t getAxisValue(int which) const;
 private:
 	enum ButtonStates buttonState_[BUTTON_COUNT] = {BUTTON_STATE_RELEASED};
 	bool buttonPressed_[BUTTON_COUNT] = {false};
 	bool buttonReleased_[BUTTON_COUNT] = {false};
+
+	int16_t axis0_ = 0;
+	int16_t axis1_ = 0;
 
 	std::map<int, SDL_Joystick*> joysticks_;
 

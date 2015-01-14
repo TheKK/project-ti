@@ -15,6 +15,8 @@ namespace
 	const float kMoveMaxSpeedY = 4.f;
 
 	const float kGravityAcc = 1.f;
+
+	const int16_t kJoyAxisMax = 32767;
 }
 
 Player::Player():
@@ -87,6 +89,12 @@ Player::updateInput_(const Controller& controller)
 		accY_ = 0.6f;
 	else
 		accY_ = velY_ * -0.3;;
+
+	if (std::abs(controller.getAxisValue(0)) > 4000)
+		accX_ = 0.6f * ((float) controller.getAxisValue(0) / (float) kJoyAxisMax);
+
+	if (std::abs(controller.getAxisValue(1)) > 4000)
+		accY_ = 0.6f * ((float) controller.getAxisValue(1) / (float) kJoyAxisMax);
 }
 
 void

@@ -1,4 +1,11 @@
+#include <iostream>
+
 #include "controller.h"
+
+namespace
+{
+	const int16_t kJoyAxisThreshold = 1000;
+}
 
 Controller::Controller()
 {
@@ -225,6 +232,15 @@ Controller::eventHandler(const SDL_Event* event)
 		}
 		break;
 
+	case SDL_JOYAXISMOTION:
+		if (event->jaxis.axis == 0) {
+			axis0_ = event->jaxis.value;
+		}
+		if (event->jaxis.axis == 1) {
+			axis1_ = event->jaxis.value;
+		}
+		break;
+
 	case SDL_JOYDEVICEADDED:
 		addJoystick_(event->jdevice.which);
 		break;
@@ -261,6 +277,19 @@ bool
 Controller::ifButtonReleased(enum Buttons which) const
 {
 	return buttonReleased_[which];
+}
+
+int16_t
+Controller::getAxisValue(int which) const
+{
+	switch (which) {
+	case 0:
+		return axis0_;
+	case 1:
+		return axis1_;
+	default:
+		return 0;
+	}
 }
 
 void
