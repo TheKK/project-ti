@@ -188,6 +188,30 @@ Controller::eventHandler(const SDL_Event* event)
 			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_RIGHT] = true;
 			break;
+		case SDL_HAT_RIGHTUP:
+			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_RIGHT] = true;
+			buttonState_[BUTTON_UP] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_UP] = true;
+			break;
+		case SDL_HAT_RIGHTDOWN:
+			buttonState_[BUTTON_RIGHT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_RIGHT] = true;
+			buttonState_[BUTTON_DOWN] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_DOWN] = true;
+			break;
+		case SDL_HAT_LEFTUP:
+			buttonState_[BUTTON_LEFT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_LEFT] = true;
+			buttonState_[BUTTON_UP] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_UP] = true;
+			break;
+		case SDL_HAT_LEFTDOWN:
+			buttonState_[BUTTON_LEFT] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_LEFT] = true;
+			buttonState_[BUTTON_DOWN] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_DOWN] = true;
+			break;
 		case SDL_HAT_CENTERED:
 			buttonState_[BUTTON_UP] = BUTTON_STATE_RELEASED;
 			buttonState_[BUTTON_DOWN] = BUTTON_STATE_RELEASED;
