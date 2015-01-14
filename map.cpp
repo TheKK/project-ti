@@ -261,9 +261,9 @@ MapTileLayer::getCollidedTiles(const SDL_Rect& rect) const
 	int leftBorder, rightBorder, topBorder, bottomBorder;
 
 	leftBorder = std::floor(rect.x / tileWidth_);
-	rightBorder = std::ceil((rect.x + rect.w) / tileWidth_);
+	rightBorder = std::ceil((rect.x + rect.w - 1) / tileWidth_);
 	topBorder = std::floor(rect.y / tileHeight_);
-	bottomBorder = std::ceil((rect.y + rect.h) / tileHeight_);
+	bottomBorder = std::ceil((rect.y + rect.h - 1) / tileHeight_);
 
 	for (int row = topBorder; row <= bottomBorder; ++row) {
 		for (int col = leftBorder; col <= rightBorder; ++col) {

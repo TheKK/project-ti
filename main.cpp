@@ -79,7 +79,7 @@ init()
 		     backLayer.getMapWidth() * backLayer.getTileWidth(),
 		     backLayer.getMapHeight() * backLayer.getTileHeight(),
 		     //200, 200);
-		     100, 100);
+		     150, 150);
 
 	camera.lookAt(player);
 

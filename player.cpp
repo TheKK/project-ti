@@ -1,3 +1,4 @@
+#include <iostream>
 #include <algorithm>
 
 #include "controller.h"
@@ -11,12 +12,9 @@ namespace
 	const int kPlayerWidth = 10;
 	const int kPlayerHeight = 10;
 
-	const float kMoveMaxSpeedX = 4.f;
-	const float kMoveMaxSpeedY = 4.f;
+	const float kMoveMaxSpeedX = 2.5f;
 
-	const float kGravityAcc = 1.f;
-
-	const int16_t kJoyAxisMax = 32767;
+	const float kGravityAcc = 0.11f;
 }
 
 Player::Player():
@@ -24,6 +22,8 @@ Player::Player():
 	velX_(0), velY_(0),
 	accX_(0), accY_(0)
 {
+	currentState_ = &standingState_;
+	nextState_ = nullptr;
 }
 
 Player::~Player()
@@ -33,13 +33,21 @@ Player::~Player()
 void
 Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 {
-	updateInput_(controller);
+	accX_ = accY_ = 0.f;
+
+	currentState_->update(*this, controller);
+	if (nextState_) {
+		currentState_->onExit(*this);
+		nextState_->onEnter(*this);
+		currentState_ = nextState_;
+		nextState_ = nullptr;
+	}
 
 	updateX_(tileLayer);
 	updateY_(tileLayer);
 }
 
-void 
+void
 Player::render(SDL_Renderer* renderer, const Camera& camera)
 {
 	SDL_Rect cameraRect = camera.getViewRect();
@@ -52,6 +60,67 @@ Player::render(SDL_Renderer* renderer, const Camera& camera)
 
 	SDL_SetRenderDrawColor(renderer, 0xff, 0x00, 0x00, 0xff);
 	SDL_RenderFillRect(renderer, &posToDraw);
+}
+
+void
+Player::setX(int x)
+{
+	posX_ = x;
+}
+
+void
+Player::setY(int y)
+{
+	posY_ = y;
+}
+
+void
+Player::setAccX(float accX)
+{
+	accX_ = accX;
+}
+
+void
+Player::setAccY(float accY)
+{
+	accY_ = accY;
+}
+
+void
+Player::setVelX(float velX)
+{
+	velX_ = velX;
+}
+
+void
+Player::setVelY(float velY)
+{
+	velY_ = velY;
+}
+
+void
+Player::setNextState(enum PlayerState nextState)
+{
+	switch (nextState) {
+	case STATE_STANDING:
+		nextState_ = &standingState_;
+		break;
+	case STATE_JUMPING:
+		nextState_ = &jumpingState_;
+		break;
+	//case STATE_FALLING:
+		//nextState_ = &fallingState_;
+		//break;
+	default:
+		nextState_ = nullptr;
+		break;
+	};
+}
+
+bool
+Player::isOnGround() const
+{
+	return isOnGround_;
 }
 
 SDL_Rect
@@ -68,40 +137,15 @@ Player::posRectOnMap() const
 }
 
 void
-Player::testCollideWithTiles_(const MapTileLayer& tileLayer)
-{
-
-}
-
-void
-Player::updateInput_(const Controller& controller)
-{
-	if (controller.getButtonState(BUTTON_LEFT) == BUTTON_STATE_PRESSED)
-		accX_ = -0.6f;
-	else if (controller.getButtonState(BUTTON_RIGHT) == BUTTON_STATE_PRESSED)
-		accX_ = 0.6f;
-	else
-		accX_ = velX_ * -0.3;;
-
-	if (controller.getButtonState(BUTTON_UP) == BUTTON_STATE_PRESSED)
-		accY_ = -0.6f;
-	else if (controller.getButtonState(BUTTON_DOWN) == BUTTON_STATE_PRESSED)
-		accY_ = 0.6f;
-	else
-		accY_ = velY_ * -0.3;;
-
-	if (std::abs(controller.getAxisValue(0)) > 4000)
-		accX_ = 0.6f * ((float) controller.getAxisValue(0) / (float) kJoyAxisMax);
-
-	if (std::abs(controller.getAxisValue(1)) > 4000)
-		accY_ = 0.6f * ((float) controller.getAxisValue(1) / (float) kJoyAxisMax);
-}
-
-void
 Player::updateX_(const MapTileLayer& tileLayer)
 {
 	std::vector<SDL_Rect> tiles;
 	SDL_Rect colliedRect;
+
+	collideWithRightWall_ = false;
+	collideWithLeftWall_ = false;
+
+	accX_ += velX_ * -0.2;
 
 	velX_ += accX_;
 	velX_ = std::min(velX_, kMoveMaxSpeedX);
@@ -121,6 +165,8 @@ Player::updateX_(const MapTileLayer& tileLayer)
 				velX_ = 0.f;
 				accX_ = 0.f;
 				posX_ = tile.x - kPlayerWidth;
+
+				collideWithRightWall_ = true;
 			}
 		}
 
@@ -137,6 +183,8 @@ Player::updateX_(const MapTileLayer& tileLayer)
 				velX_ = 0.0f;
 				accX_ = 0.0f;
 				posX_ = tile.x + tile.w;
+
+				collideWithLeftWall_ = true;
 			}
 		}
 	} else if (velX_ < 0) {
@@ -149,6 +197,8 @@ Player::updateX_(const MapTileLayer& tileLayer)
 		tiles = tileLayer.getCollidedTiles(colliedRect);
 
 		for (const SDL_Rect& tile : tiles) {
+			collideWithLeftWall_ = true;
+
 			if (SDL_HasIntersection(&tile, &colliedRect)) {
 				velX_ = 0.0f;
 				accX_ = 0.0f;
@@ -165,6 +215,8 @@ Player::updateX_(const MapTileLayer& tileLayer)
 		tiles = tileLayer.getCollidedTiles(colliedRect);
 
 		for (const SDL_Rect& tile : tiles) {
+			collideWithRightWall_ = true;
+
 			if (SDL_HasIntersection(&tile, &colliedRect)) {
 				velX_ = 0.f;
 				accX_ = 0.f;
@@ -182,9 +234,9 @@ Player::updateY_(const MapTileLayer& tileLayer)
 	std::vector<SDL_Rect> tiles;
 	SDL_Rect colliedRect;
 
+	accY_ = kGravityAcc;
+
 	velY_ += accY_;
-	velY_ = std::min(velY_, kMoveMaxSpeedY);
-	velY_ = std::max(velY_, -1 * kMoveMaxSpeedY);
 
 	if (velY_ > 0.f) {
 		/* Test botton part first */
@@ -253,4 +305,15 @@ Player::updateY_(const MapTileLayer& tileLayer)
 	}
 
 	posY_ += velY_;
+
+	colliedRect.x = std::round(posX_);
+	colliedRect.y = std::round(posY_ + kPlayerHeight / 2) + 1;
+	colliedRect.w = std::round(kPlayerWidth);
+	colliedRect.h = std::round(kPlayerHeight / 2);
+
+	tiles = tileLayer.getCollidedTiles(colliedRect);
+	if (tiles.size() > 0)
+		isOnGround_ = true;
+	else
+		isOnGround_ = false;
 }
