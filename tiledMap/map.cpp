@@ -48,6 +48,7 @@ loadTexture_(SDL_Renderer* renderer, const std::string& filePath)
 	return tex;
 }
 
+/* =================================== MapLoader */
 MapLoader::MapLoader()
 {
 }
@@ -106,6 +107,7 @@ MapLoader::getTileSets() const
 	return tileSetsToReturn;
 }
 
+/* =================================== MapTileLayer */
 MapTileLayer::MapTileLayer()
 {
 }

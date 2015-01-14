@@ -41,7 +41,7 @@ Camera::update()
 		return;
 
 	int dx = 0, dy = 0;
-	SDL_Rect targetRect_ = target_->rect();
+	SDL_Rect targetRect_ = target_->posRectOnMap();
 
 	if (targetRect_.x < viewRect_.x + deadZoneRect_.x)
 		dx = targetRect_.x - (viewRect_.x + deadZoneRect_.x);

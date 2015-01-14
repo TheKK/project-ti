@@ -16,11 +16,11 @@ public:
 	void update(const Controller& controller, const MapTileLayer& tiles);
 	void render(SDL_Renderer* renderer, const Camera& camera);
 
-	void setPos(int x, int y);
-
-	SDL_Rect rect() const;
+	SDL_Rect posRectOnMap() const;
 private:
-	SDL_Rect posRect_;
+	float posX_, posY_;
+	float velX_, velY_;
+	float accX_, accY_;
 };
 
 #endif /* PLAYER_H */

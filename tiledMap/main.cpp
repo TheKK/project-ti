@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdexcept>
 
+#include "timer.h"
 #include "map.h"
 #include "sprite.h"
 #include "controller.h"
@@ -151,12 +152,15 @@ int
 main(int argc, char* argv[])
 {
 	SDL_Event event;
+	Timer timer;
 
 	if (init() < 0)
 		return 1;
 
 	try {
 		while (appIsRunning) {
+			timer.start();
+
 			while (SDL_PollEvent(&event))
 				eventHandler(&event);
 
@@ -164,7 +168,10 @@ main(int argc, char* argv[])
 
 			render();
 
-			SDL_Delay(30);
+			if (timer.getTicks() < (1000.0 / (double) 60)) {
+				SDL_Delay((1000.0 / (double) 60) -
+					  timer.getTicks());
+			}
 		}
 
 	} catch (std::runtime_error e) {
