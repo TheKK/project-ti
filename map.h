@@ -23,6 +23,9 @@ public:
 
 	const Json::Value& getLayer(const std::string& layerName) const;
 	const Json::Value& getTileSets() const;
+
+	int getTileWidth() const;
+	int getTileheight() const;
 private:
 	Json::Value mapData_;
 };
@@ -42,12 +45,17 @@ public:
 	void update();
 	void render(SDL_Renderer* SDL_Renderer, const Camera& camera);
 
+	std::vector<SDL_Rect> getCollidedTiles(SDL_Rect rect) const;
+
 	int getMapWidth() const;
 	int getMapHeight() const;
 	int getTileWidth() const;
 	int getTileHeight() const;
 private:
 	Json::Value layer_;
+
+	int mapWidth_, mapHeight_;
+	int tileWidth_, tileHeight_;
 
 	std::vector<Json::Value> tileSets_;
 	std::map<std::string, SDL_Texture*> tileImages_;

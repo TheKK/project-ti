@@ -107,6 +107,18 @@ MapLoader::getTileSets() const
 	return tileSetsToReturn;
 }
 
+int
+MapLoader::getTileWidth() const
+{
+	return mapData_["tilewidth"].asInt();
+}
+
+int
+MapLoader::getTileheight() const
+{
+	return mapData_["tileheight"].asInt();
+}
+
 /* =================================== MapTileLayer */
 MapTileLayer::MapTileLayer()
 {
@@ -128,6 +140,12 @@ MapTileLayer::load(SDL_Renderer* renderer, const MapLoader& mapLoader,
 		   const std::string& layerName)
 {
 	layer_ = mapLoader.getLayer(layerName);
+
+	tileWidth_ = mapLoader.getTileWidth();
+	tileHeight_ = mapLoader.getTileheight();
+
+	mapWidth_ = layer_["width"].asInt();
+	mapWidth_ = layer_["height"].asInt();
 
 	for (auto& tileSet : mapLoader.getTileSets()) {
 		std::string imageName = tileSet["image"].asString();
@@ -236,26 +254,57 @@ MapTileLayer::render(SDL_Renderer* renderer, const Camera& camera)
 	}
 }
 
+std::vector<SDL_Rect>
+MapTileLayer::getCollidedTiles(SDL_Rect rect) const
+{
+	std::vector<SDL_Rect> tilesToReturn;
+	int leftBorder, rightBorder, topBorder, bottomBorder;
+
+	leftBorder = std::floor(rect.x / tileWidth_);
+	rightBorder = std::ceil((rect.x + rect.w) / tileWidth_);
+	topBorder = std::floor(rect.y / tileHeight_);
+	bottomBorder = std::ceil((rect.y + rect.h) / tileHeight_);
+
+	for (int row = topBorder; row <= bottomBorder; ++row) {
+		for (int col = leftBorder; col <= leftBorder; ++col) {
+			/* TODO Return only solid tile */
+			if (layer_["data"][row * mapWidth_ + col] == 0)
+				continue;
+
+			SDL_Rect tile;
+
+			tile.w = tileWidth_;
+			tile.h = tileHeight_;
+			tile.x = tileWidth_ * col;
+			tile.y = tileHeight_ * row;
+
+			tilesToReturn.push_back(tile);
+		}
+	}
+
+	return tilesToReturn;
+}
+
 int
 MapTileLayer::getMapWidth() const
 {
-	return layer_["width"].asInt();
+	return mapWidth_;
 }
 
 int
 MapTileLayer::getMapHeight() const
 {
-	return layer_["height"].asInt();
+	return mapHeight_;
 }
 
 int
 MapTileLayer::getTileWidth() const
 {
-	return layer_["tilewidth"].asInt();
+	return tileWidth_;
 }
 
 int
 MapTileLayer::getTileHeight() const
 {
-	return layer_["tileheight"].asInt();
+	return tileHeight_;
 }

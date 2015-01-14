@@ -2,6 +2,7 @@
 
 #include "controller.h"
 #include "camera.h"
+#include "map.h"
 
 #include "player.h"
 
@@ -13,7 +14,7 @@ namespace
 	const float kMoveMaxSpeedX = 4.f;
 	const float kMoveMaxSpeedY = 4.f;
 
-	const float kGravityAcc = 1.f;
+	//const float kGravityAcc = 1.f;
 }
 
 Player::Player():
@@ -28,7 +29,7 @@ Player::~Player()
 }
 
 void
-Player::update(const Controller& controller, const MapTileLayer& tiles)
+Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 {
 	/* Handle controller */
 	if (controller.getButtonState(BUTTON_UP) == BUTTON_STATE_PRESSED)
@@ -56,6 +57,8 @@ Player::update(const Controller& controller, const MapTileLayer& tiles)
 	velY_ += accY_;
 	velY_ = std::min(velY_, kMoveMaxSpeedY);
 	velY_ = std::max(velY_, -1 * kMoveMaxSpeedY);
+
+	testCollideWithTiles_(tileLayer);
 }
 
 void 
@@ -84,4 +87,12 @@ Player::posRectOnMap() const
 	posRect.y = round(posY_);
 
 	return posRect;
+}
+
+void
+Player::testCollideWithTiles_(const MapTileLayer& tileLayer)
+{
+	std::vector<SDL_Rect> tiles;
+
+	tiles = tileLayer.getCollidedTiles(posRectOnMap());
 }

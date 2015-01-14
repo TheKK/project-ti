@@ -13,7 +13,8 @@ public:
 	Player();
 	~Player();
 
-	void update(const Controller& controller, const MapTileLayer& tiles);
+	void update(const Controller& controller,
+		    const MapTileLayer& tileLayer);
 	void render(SDL_Renderer* renderer, const Camera& camera);
 
 	SDL_Rect posRectOnMap() const;
@@ -21,6 +22,8 @@ private:
 	float posX_, posY_;
 	float velX_, velY_;
 	float accX_, accY_;
+
+	void testCollideWithTiles_(const MapTileLayer& tileLayer);
 };
 
 #endif /* PLAYER_H */
