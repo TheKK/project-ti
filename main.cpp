@@ -12,6 +12,8 @@
 
 namespace
 {
+	const char kMapFile[] = "map.json";
+
 	SDL_Window* mainWindow = nullptr;
 	SDL_Renderer* mainRenderer = nullptr;
 	bool appIsRunning = true;
@@ -32,7 +34,9 @@ reloadMap()
 {
 	MapLoader mapLoader;
 
-	mapLoader.load("map.json");
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+		    "Reload map file: %s", kMapFile);
+	mapLoader.load(kMapFile);
 
 	backLayer.cleanUp();
 	backLayer.load(mainRenderer, mapLoader, "layer_one");
@@ -41,7 +45,8 @@ reloadMap()
 	foreLayer.load(mainRenderer, mapLoader, "layer_two");
 
 	objectLayer.cleanUp();
-	objectLayer.load(mapLoader, "object");
+	//objectLayer.load(mapLoader, "object");
+	objectLayer = mapLoader.getObjectLayer("object");
 
 	const Json::Value& playerStart = objectLayer.getObject("startPoint");
 	player.setX(playerStart["x"].asInt());
@@ -85,7 +90,8 @@ init()
 	foreLayer.load(mainRenderer, mapLoader, "layer_two");
 
 	objectLayer.cleanUp();
-	objectLayer.load(mapLoader, "object");
+	//objectLayer.load(mapLoader, "object");
+	objectLayer = mapLoader.getObjectLayer("object");
 
 	const Json::Value& playerStart = objectLayer.getObject("startPoint");
 	player.setX(playerStart["x"].asInt());

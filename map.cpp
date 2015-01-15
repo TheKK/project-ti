@@ -58,10 +58,6 @@ MapLoader::MapLoader(const std::string& filePath)
 	load(filePath);
 }
 
-MapLoader::~MapLoader()
-{
-}
-
 void
 MapLoader::load(const std::string& filePath)
 {
@@ -76,8 +72,6 @@ MapLoader::load(const std::string& filePath)
 		fd.close();
 		throw std::runtime_error(reader.getFormattedErrorMessages());
 	}
-
-	fd.close();
 }
 
 const Json::Value&
@@ -153,6 +147,21 @@ MapTileLayer::MapTileLayer(SDL_Renderer* renderer, const MapLoader& mapLoader,
 			   const std::string& layerName)
 {
 	load(renderer, mapLoader, layerName);
+}
+
+MapTileLayer::MapTileLayer(const MapTileLayer& clone)
+{
+	this->cleanUp();
+
+	this->layer_ = clone.layer_;
+
+	this->mapWidth_ = clone.mapWidth_;
+	this->mapHeight_ = clone.mapHeight_;
+	this->tileWidth_ = clone.tileWidth_;
+	this->tileHeight_ = clone.tileHeight_;
+
+	this->tileSets_  = clone.tileSets_;
+	this->tileImages_ = clone.tileImages_;
 }
 
 MapTileLayer::~MapTileLayer()
@@ -348,8 +357,12 @@ MapObjectLayer::MapObjectLayer(const MapLoader& mapLoader,
 	load(mapLoader, layerName);
 }
 
-MapObjectLayer::~MapObjectLayer()
+MapObjectLayer&
+MapObjectLayer::operator=(const Json::Value& target)
 {
+	this->layer_ = target;
+
+	return *this;
 }
 
 void

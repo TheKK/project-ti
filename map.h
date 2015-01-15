@@ -17,7 +17,6 @@ class MapLoader
 public:
 	MapLoader();
 	MapLoader(const std::string& filePath);
-	~MapLoader();
 
 	void load(const std::string& filePath);
 
@@ -37,6 +36,7 @@ public:
 	MapTileLayer();
 	MapTileLayer(SDL_Renderer* renderer, const MapLoader& mapLoader,
 		     const std::string& layerName);
+	MapTileLayer(const MapTileLayer& clone);
 	~MapTileLayer();
 
 	void load(SDL_Renderer* renderer, const MapLoader& mapLoader,
@@ -68,7 +68,8 @@ public:
 	MapObjectLayer();
 	MapObjectLayer(const MapLoader& mapLoader,
 		       const std::string& layerName);
-	~MapObjectLayer();
+
+	MapObjectLayer& operator=(const Json::Value& target);
 
 	void load(const MapLoader& mapLoader,
 		  const std::string& layerName);
