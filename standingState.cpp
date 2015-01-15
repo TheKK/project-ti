@@ -3,6 +3,8 @@
 
 #include "standingState.h"
 
+#include <iostream>
+
 namespace
 {
 	const float kMoveAccX = 0.7f;
@@ -13,6 +15,8 @@ namespace
 void
 StandingState::onEnter(Player& player)
 {
+	std::cout << "enter standing\n";
+
 	player.setVelY(0.f);
 }
 

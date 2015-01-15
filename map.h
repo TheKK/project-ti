@@ -21,7 +21,8 @@ public:
 
 	void load(const std::string& filePath);
 
-	const Json::Value& getLayer(const std::string& layerName) const;
+	const Json::Value& getTileLayer(const std::string& layerName) const;
+	const Json::Value& getObjectLayer(const std::string& layerName) const;
 	const Json::Value& getTileSets() const;
 
 	int getTileWidth() const;
@@ -59,6 +60,23 @@ private:
 
 	std::vector<Json::Value> tileSets_;
 	std::map<std::string, SDL_Texture*> tileImages_;
+};
+
+class MapObjectLayer
+{
+public:
+	MapObjectLayer();
+	MapObjectLayer(const MapLoader& mapLoader,
+		       const std::string& layerName);
+	~MapObjectLayer();
+
+	void load(const MapLoader& mapLoader,
+		  const std::string& layerName);
+	void cleanUp();
+
+	const Json::Value& getObject(const std::string& name);
+private:
+	Json::Value layer_;
 };
 
 #endif /* MAP_H */

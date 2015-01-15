@@ -45,6 +45,7 @@ Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 
 	updateX_(tileLayer);
 	updateY_(tileLayer);
+	checkWallAround_(tileLayer);
 }
 
 void
@@ -98,6 +99,18 @@ Player::setVelY(float velY)
 	velY_ = velY;
 }
 
+int
+Player::getVelX() const
+{
+	return velX_;
+}
+
+int
+Player::getVelY() const
+{
+	return velY_;
+}
+
 void
 Player::setNextState(enum PlayerState nextState)
 {
@@ -108,9 +121,9 @@ Player::setNextState(enum PlayerState nextState)
 	case STATE_JUMPING:
 		nextState_ = &jumpingState_;
 		break;
-	//case STATE_FALLING:
-		//nextState_ = &fallingState_;
-		//break;
+	case STATE_FALLING:
+		nextState_ = &fallingState_;
+		break;
 	default:
 		nextState_ = nullptr;
 		break;
@@ -121,6 +134,18 @@ bool
 Player::isOnGround() const
 {
 	return isOnGround_;
+}
+
+bool
+Player::isBesideRightWall() const
+{
+	return isBesideRightWall_;
+}
+
+bool
+Player::isBesideLeftWall() const
+{
+	return isBesideLeftWall_;
 }
 
 SDL_Rect
@@ -142,10 +167,10 @@ Player::updateX_(const MapTileLayer& tileLayer)
 	std::vector<SDL_Rect> tiles;
 	SDL_Rect colliedRect;
 
-	collideWithRightWall_ = false;
-	collideWithLeftWall_ = false;
-
-	accX_ += velX_ * -0.2;
+	if (isOnGround_)
+		accX_ += velX_ * -0.2;
+	else
+		accX_ += velX_ * -0.05;
 
 	velX_ += accX_;
 	velX_ = std::min(velX_, kMoveMaxSpeedX);
@@ -165,8 +190,6 @@ Player::updateX_(const MapTileLayer& tileLayer)
 				velX_ = 0.f;
 				accX_ = 0.f;
 				posX_ = tile.x - kPlayerWidth;
-
-				collideWithRightWall_ = true;
 			}
 		}
 
@@ -183,8 +206,6 @@ Player::updateX_(const MapTileLayer& tileLayer)
 				velX_ = 0.0f;
 				accX_ = 0.0f;
 				posX_ = tile.x + tile.w;
-
-				collideWithLeftWall_ = true;
 			}
 		}
 	} else if (velX_ < 0) {
@@ -197,8 +218,6 @@ Player::updateX_(const MapTileLayer& tileLayer)
 		tiles = tileLayer.getCollidedTiles(colliedRect);
 
 		for (const SDL_Rect& tile : tiles) {
-			collideWithLeftWall_ = true;
-
 			if (SDL_HasIntersection(&tile, &colliedRect)) {
 				velX_ = 0.0f;
 				accX_ = 0.0f;
@@ -215,8 +234,6 @@ Player::updateX_(const MapTileLayer& tileLayer)
 		tiles = tileLayer.getCollidedTiles(colliedRect);
 
 		for (const SDL_Rect& tile : tiles) {
-			collideWithRightWall_ = true;
-
 			if (SDL_HasIntersection(&tile, &colliedRect)) {
 				velX_ = 0.f;
 				accX_ = 0.f;
@@ -234,7 +251,7 @@ Player::updateY_(const MapTileLayer& tileLayer)
 	std::vector<SDL_Rect> tiles;
 	SDL_Rect colliedRect;
 
-	accY_ = kGravityAcc;
+	accY_ += kGravityAcc;
 
 	velY_ += accY_;
 
@@ -305,7 +322,15 @@ Player::updateY_(const MapTileLayer& tileLayer)
 	}
 
 	posY_ += velY_;
+}
 
+void
+Player::checkWallAround_(const MapTileLayer& tileLayer)
+{
+	std::vector<SDL_Rect> tiles;
+	SDL_Rect colliedRect;
+
+	/* Check if standing on floor */
 	colliedRect.x = std::round(posX_);
 	colliedRect.y = std::round(posY_ + kPlayerHeight / 2) + 1;
 	colliedRect.w = std::round(kPlayerWidth);
@@ -316,4 +341,28 @@ Player::updateY_(const MapTileLayer& tileLayer)
 		isOnGround_ = true;
 	else
 		isOnGround_ = false;
+
+	/* Check if left side is wall */
+	colliedRect.x = std::round(posX_) - 1;
+	colliedRect.y = std::round(posY_);
+	colliedRect.w = std::round(kPlayerWidth / 2);
+	colliedRect.h = std::round(kPlayerHeight);
+
+	tiles = tileLayer.getCollidedTiles(colliedRect);
+	if (tiles.size() > 0)
+		isBesideLeftWall_ = true;
+	else
+		isBesideLeftWall_ = false;
+
+	/* Check if right side is wall */
+	colliedRect.x = std::round(posX_ + kPlayerWidth / 2) + 1;
+	colliedRect.y = std::round(posY_);
+	colliedRect.w = std::round(kPlayerWidth / 2);
+	colliedRect.h = std::round(kPlayerHeight);
+
+	tiles = tileLayer.getCollidedTiles(colliedRect);
+	if (tiles.size() > 0)
+		isBesideRightWall_ = true;
+	else
+		isBesideRightWall_ = false;
 }

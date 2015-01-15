@@ -17,7 +17,9 @@ namespace
 	bool appIsRunning = true;
 
 	MapTileLayer backLayer;
-	MapTileLayer foreLayer;;
+	MapTileLayer foreLayer;
+	MapObjectLayer objectLayer;
+
 	Camera camera;
 
 	Controller controller;
@@ -37,6 +39,13 @@ reloadMap()
 
 	foreLayer.cleanUp();
 	foreLayer.load(mainRenderer, mapLoader, "layer_two");
+
+	objectLayer.cleanUp();
+	objectLayer.load(mapLoader, "object");
+
+	const Json::Value& playerStart = objectLayer.getObject("startPoint");
+	player.setX(playerStart["x"].asInt());
+	player.setY(playerStart["y"].asInt());
 }
 
 int
@@ -75,12 +84,18 @@ init()
 	foreLayer.cleanUp();
 	foreLayer.load(mainRenderer, mapLoader, "layer_two");
 
+	objectLayer.cleanUp();
+	objectLayer.load(mapLoader, "object");
+
+	const Json::Value& playerStart = objectLayer.getObject("startPoint");
+	player.setX(playerStart["x"].asInt());
+	player.setY(playerStart["y"].asInt());
+
 	camera.setup(mainRenderer,
 		     backLayer.getMapWidth() * backLayer.getTileWidth(),
 		     backLayer.getMapHeight() * backLayer.getTileHeight(),
 		     //200, 200);
 		     150, 150);
-
 	camera.lookAt(player);
 
 	return 0;

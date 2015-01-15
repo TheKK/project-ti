@@ -7,6 +7,7 @@
 #include "state.h"
 #include "standingState.h"
 #include "jumpingState.h"
+#include "fallingState.h"
 
 class Controller;
 class Camera;
@@ -29,6 +30,7 @@ public:
 		    const MapTileLayer& tileLayer);
 	void render(SDL_Renderer* renderer, const Camera& camera);
 
+	/* TODO Use DTO or something */
 	void setX(int x);
 	void setY(int y);
 	void setAccX(float accX);
@@ -36,39 +38,36 @@ public:
 	void setVelX(float velX);
 	void setVelY(float velY);
 
+	int getVelX() const;
+	int getVelY() const;
+
 	void setNextState(enum PlayerState nextState);
 
 	bool isOnGround() const;
+	bool isBesideRightWall() const;
+	bool isBesideLeftWall() const;
 
 	SDL_Rect posRectOnMap() const;
 private:
-	class FallingState : public State
-	{
-	public:
-		virtual void onEnter(Player& player) override;
-		virtual void onExit(Player& player) override;
-		virtual void update(Player& player,
-				    const Controller& controller) override;
-	private:
-		void handleInput_(Player& player,
-				  const Controller& controller);
-	};
-
+	/* TODO Maybe use queue to save nextState */
 	State* currentState_;
 	State* nextState_;
 	StandingState standingState_;
 	JumpingState jumpingState_;
+	FallingState fallingState_;
 
 	float posX_, posY_;
 	float velX_, velY_;
 	float accX_, accY_;
 
-	bool collideWithRightWall_ = false;
-	bool collideWithLeftWall_ = false;
+	bool isBesideRightWall_ = false;
+	bool isBesideLeftWall_ = false;
 	bool isOnGround_ = false;
 
 	void updateX_(const MapTileLayer& tileLayer);
 	void updateY_(const MapTileLayer& tileLayer);
+
+	void checkWallAround_(const MapTileLayer& tileLayer);
 };
 
 #endif /* PLAYER_H */

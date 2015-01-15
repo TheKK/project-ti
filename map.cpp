@@ -81,14 +81,31 @@ MapLoader::load(const std::string& filePath)
 }
 
 const Json::Value&
-MapLoader::getLayer(const std::string& layerName) const
+MapLoader::getTileLayer(const std::string& layerName) const
 {
 	if (mapData_["layers"].isNull())
 		throw std::runtime_error(
 			"No such object 'layers' in map file, it's borken");
 
 	for (auto& layer : mapData_["layers"]) {
-		if (layer["name"].asString() == layerName)
+		if ((layer["name"].asString() == layerName) &&
+		    (layer["type"].asString() == "tilelayer"))
+			return layer;
+	}
+
+	throw std::runtime_error("No such layer in map file");
+}
+
+const Json::Value&
+MapLoader::getObjectLayer(const std::string& layerName) const
+{
+	if (mapData_["layers"].isNull())
+		throw std::runtime_error(
+			"No such object 'layers' in map file, it's borken");
+
+	for (auto& layer : mapData_["layers"]) {
+		if ((layer["name"].asString() == layerName) &&
+		    (layer["type"].asString() == "objectgroup"))
 			return layer;
 	}
 
@@ -110,13 +127,21 @@ MapLoader::getTileSets() const
 int
 MapLoader::getTileWidth() const
 {
-	return mapData_["tilewidth"].asInt();
+	char objectName[] = "tilewidth";
+
+	SDL_assert (!mapData_[objectName].isNull());
+
+	return mapData_[objectName].asInt();
 }
 
 int
 MapLoader::getTileheight() const
 {
-	return mapData_["tileheight"].asInt();
+	char objectName[] = "tilewidth";
+
+	SDL_assert(!mapData_[objectName].isNull());
+
+	return mapData_[objectName].asInt();
 }
 
 /* =================================== MapTileLayer */
@@ -139,7 +164,7 @@ void
 MapTileLayer::load(SDL_Renderer* renderer, const MapLoader& mapLoader,
 		   const std::string& layerName)
 {
-	layer_ = mapLoader.getLayer(layerName);
+	layer_ = mapLoader.getTileLayer(layerName);
 
 	tileWidth_ = mapLoader.getTileWidth();
 	tileHeight_ = mapLoader.getTileheight();
@@ -310,4 +335,45 @@ int
 MapTileLayer::getTileHeight() const
 {
 	return tileHeight_;
+}
+
+/* =================================== MapObjectLayer */
+MapObjectLayer::MapObjectLayer()
+{
+}
+
+MapObjectLayer::MapObjectLayer(const MapLoader& mapLoader,
+			       const std::string& layerName)
+{
+	load(mapLoader, layerName);
+}
+
+MapObjectLayer::~MapObjectLayer()
+{
+}
+
+void
+MapObjectLayer::load(const MapLoader& mapLoader,
+		     const std::string& layerName)
+{
+	layer_ = mapLoader.getObjectLayer(layerName);
+}
+
+void
+MapObjectLayer::cleanUp()
+{
+	layer_.clear();
+}
+
+const Json::Value&
+MapObjectLayer::getObject(const std::string& name)
+{
+	static Json::Value nullValue;
+
+	for (const Json::Value& e : layer_["objects"]) {
+		if (e["name"].asString() == name)
+			return e;
+	}
+
+	throw std::runtime_error("No such object in this object layer");
 }
