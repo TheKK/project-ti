@@ -23,7 +23,7 @@ public:
 private:
 	SDL_Renderer* renderer_ = nullptr;
 
-	std::map<std::string, SDL_Texture*> loadedTextures_;
+	std::map<std::string, std::weak_ptr<SDL_Texture>> loadedTextures_;
 
 	SDL_Texture* loadTextureFromFile_(const std::string& filePath);
 };

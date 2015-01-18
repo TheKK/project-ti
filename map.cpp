@@ -168,9 +168,6 @@ MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 void
 MapTileLayer::cleanUp()
 {
-	layer_.clear();
-	tileSets_.clear();
-	tileImages_.clear();
 }
 
 void
