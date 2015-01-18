@@ -9,13 +9,14 @@
 #include "controller.h"
 #include "camera.h"
 #include "player.h"
+#include "graphics.h"
 
 namespace
 {
 	const char kMapFile[] = "map.json";
 
 	SDL_Window* mainWindow = nullptr;
-	SDL_Renderer* mainRenderer = nullptr;
+	Graphics graphics;
 	bool appIsRunning = true;
 
 	MapTileLayer backLayer;
@@ -30,34 +31,38 @@ namespace
 }
 
 void
-reloadMap()
+loadMap(const std::string& mapFile)
 {
 	MapLoader mapLoader;
 
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-		    "Reload map file: %s", kMapFile);
-	mapLoader.load(kMapFile);
+		    "Reload map file: %s", mapFile.c_str());
+	mapLoader.load(mapFile);
 
 	backLayer.cleanUp();
-	backLayer.load(mainRenderer, mapLoader, "layer_one");
+	backLayer.load(graphics, mapLoader, "layer_one");
 
 	foreLayer.cleanUp();
-	foreLayer.load(mainRenderer, mapLoader, "layer_two");
+	foreLayer.load(graphics, mapLoader, "layer_two");
 
 	objectLayer.cleanUp();
-	//objectLayer.load(mapLoader, "object");
-	objectLayer = mapLoader.getObjectLayer("object");
+	objectLayer.load(mapLoader, "object");
 
 	const Json::Value& playerStart = objectLayer.getObject("startPoint");
 	player.setX(playerStart["x"].asInt());
 	player.setY(playerStart["y"].asInt());
+
+	camera.setup(graphics,
+		     backLayer.getMapWidth() * backLayer.getTileWidth(),
+		     backLayer.getMapHeight() * backLayer.getTileHeight(),
+		     //200, 200);
+		     150, 150);
+	camera.lookAt(player);
 }
 
 int
 init()
 {
-	MapLoader mapLoader;
-
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 		return -1;
 
@@ -74,35 +79,7 @@ init()
 	if (!mainWindow)
 		return -1;
 
-	mainRenderer = SDL_CreateRenderer(
-		mainWindow,
-		-1,
-		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!mainRenderer)
-		return -1;
-
-	mapLoader.load("map.json");
-
-	backLayer.cleanUp();
-	backLayer.load(mainRenderer, mapLoader, "layer_one");
-
-	foreLayer.cleanUp();
-	foreLayer.load(mainRenderer, mapLoader, "layer_two");
-
-	objectLayer.cleanUp();
-	//objectLayer.load(mapLoader, "object");
-	objectLayer = mapLoader.getObjectLayer("object");
-
-	const Json::Value& playerStart = objectLayer.getObject("startPoint");
-	player.setX(playerStart["x"].asInt());
-	player.setY(playerStart["y"].asInt());
-
-	camera.setup(mainRenderer,
-		     backLayer.getMapWidth() * backLayer.getTileWidth(),
-		     backLayer.getMapHeight() * backLayer.getTileHeight(),
-		     //200, 200);
-		     150, 150);
-	camera.lookAt(player);
+	graphics.init(mainWindow);
 
 	return 0;
 }
@@ -110,9 +87,6 @@ init()
 void
 quit()
 {
-	SDL_DestroyRenderer(mainRenderer);
-	mainRenderer = nullptr;
-
 	SDL_DestroyWindow(mainWindow);
 	mainWindow = nullptr;
 
@@ -135,11 +109,14 @@ eventHandler(const SDL_Event* event)
 
 		switch (event->key.keysym.scancode) {
 		case SDL_SCANCODE_R:
-			reloadMap();
+			loadMap("./map.json");
 			break;
 		default:
 			break;
 		};
+		break;
+	case SDL_DROPFILE:
+		loadMap(event->drop.file);
 		break;
 	};
 }
@@ -159,8 +136,7 @@ update()
 void
 render()
 {
-	SDL_SetRenderDrawColor(mainRenderer, 0x33, 0x33, 0x33, 0xff);
-	SDL_RenderClear(mainRenderer);
+	graphics.clear();
 
 	SDL_Rect viewport;
 
@@ -169,14 +145,15 @@ render()
 	viewport.w = backLayer.getTileWidth() * backLayer.getMapWidth();
 	viewport.h = backLayer.getTileHeight() * backLayer.getMapHeight();
 
-	SDL_SetRenderDrawColor(mainRenderer, 0x44, 0x33, 0x33, 0xff);
-	SDL_RenderFillRect(mainRenderer, &viewport);
+	//SDL_SetRenderDrawColor(graphics, 0x44, 0x33, 0x33, 0xff);
+	//SDL_RenderFillRect(graphics, &viewport);
 
-	backLayer.render(mainRenderer, camera);
-	player.render(mainRenderer, camera);
-	foreLayer.render(mainRenderer, camera);
+	backLayer.render(graphics, camera);
+	player.render(graphics, camera);
+	foreLayer.render(graphics, camera);
 
-	SDL_RenderPresent(mainRenderer);
+	// present
+	graphics.present();
 }
 
 int
@@ -187,6 +164,8 @@ main(int argc, char* argv[])
 
 	if (init() < 0)
 		return 1;
+
+	loadMap("./map.json");
 
 	try {
 		while (appIsRunning) {

@@ -9,44 +9,7 @@
 
 #include "controller.h"
 #include "camera.h"
-
-SDL_Texture*
-loadTexture_(SDL_Renderer* renderer, const std::string& filePath)
-{
-	SDL_Surface* loadedImage = nullptr;
-	SDL_Texture* tex = nullptr;
-	char* basePath = nullptr;
-	std::string fullPath;
-
-	basePath = SDL_GetBasePath();
-	fullPath += basePath;
-	fullPath += filePath;
-
-	SDL_free(basePath);
-	basePath = nullptr;
-
-	loadedImage = IMG_Load(fullPath.c_str());
-	if (loadedImage == nullptr) {
-		std::string errMsg("IMG error while opening: ");
-		errMsg += IMG_GetError();
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, errMsg.c_str());
-		return nullptr;
-	}
-
-	tex = SDL_CreateTextureFromSurface(renderer, loadedImage);
-	if (tex == nullptr) {
-		std::string errMsg("SDL error while converting surface: ");
-		errMsg += SDL_GetError();
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, errMsg.c_str());
-		return nullptr;
-	}
-
-	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-
-	SDL_FreeSurface(loadedImage);
-
-	return tex;
-}
+#include "graphics.h"
 
 /* =================================== MapLoader */
 MapLoader::MapLoader()
@@ -143,10 +106,10 @@ MapTileLayer::MapTileLayer()
 {
 }
 
-MapTileLayer::MapTileLayer(SDL_Renderer* renderer, const MapLoader& mapLoader,
+MapTileLayer::MapTileLayer(Graphics& graphics, const MapLoader& mapLoader,
 			   const std::string& layerName)
 {
-	load(renderer, mapLoader, layerName);
+	load(graphics, mapLoader, layerName);
 }
 
 MapTileLayer::MapTileLayer(const MapTileLayer& clone)
@@ -170,7 +133,7 @@ MapTileLayer::~MapTileLayer()
 }
 
 void
-MapTileLayer::load(SDL_Renderer* renderer, const MapLoader& mapLoader,
+MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 		   const std::string& layerName)
 {
 	layer_ = mapLoader.getTileLayer(layerName);
@@ -185,8 +148,8 @@ MapTileLayer::load(SDL_Renderer* renderer, const MapLoader& mapLoader,
 		std::string imageName = tileSet["image"].asString();
 
 		tileSets_.push_back(tileSet);
-		tileImages_[imageName] = loadTexture_(renderer, imageName);
-		if (!tileImages_[imageName])
+		tileImages_[imageName] = graphics.loadSprite(imageName);
+		if (!tileImages_[imageName].get())
 			throw std::runtime_error("file not found");
 
 	}
@@ -207,11 +170,6 @@ MapTileLayer::cleanUp()
 {
 	layer_.clear();
 	tileSets_.clear();
-		
-	for (auto& e : tileImages_) {
-		SDL_DestroyTexture(e.second);
-		e.second = nullptr;
-	}
 	tileImages_.clear();
 }
 
@@ -221,7 +179,7 @@ MapTileLayer::update()
 }
 
 void
-MapTileLayer::render(SDL_Renderer* renderer, const Camera& camera)
+MapTileLayer::render(Graphics& graphics, const Camera& camera)
 {
 	int mapWidth, mapHeight;
 	const SDL_Rect& cameraRect = camera.getViewRect();
@@ -234,7 +192,7 @@ MapTileLayer::render(SDL_Renderer* renderer, const Camera& camera)
 			int startTileId, tileId;
 			int tileWidth, tileHeight;
 			int tileRow, tileCol;
-			SDL_Texture* tileImage = nullptr;
+			std::shared_ptr<SDL_Texture> tileImage;
 			SDL_Rect tileClip, tileDst;
 
 			tileId = layer_["data"][mapWidth * y + x].asInt();
@@ -282,8 +240,7 @@ MapTileLayer::render(SDL_Renderer* renderer, const Camera& camera)
 			tileDst.w = tileWidth;
 			tileDst.h = tileHeight;
 
-			SDL_RenderCopy(renderer, tileImage, &tileClip,
-				       &tileDst);
+			graphics.render(tileImage, tileClip, tileDst);
 		}
 	}
 }

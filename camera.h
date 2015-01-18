@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 class Player;
+class Graphics;
 
 class Camera
 {
@@ -11,7 +12,7 @@ public:
 	Camera();
 	~Camera();
 
-	void setup(SDL_Renderer* renderer,
+	void setup(Graphics& graphics,
 		   int worldWidth, int worldHeight,
 		   int viewWidth, int viewHeight);
 

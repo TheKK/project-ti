@@ -4,6 +4,7 @@
 #include "controller.h"
 #include "camera.h"
 #include "map.h"
+#include "graphics.h"
 
 #include "player.h"
 
@@ -49,7 +50,7 @@ Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 }
 
 void
-Player::render(SDL_Renderer* renderer, const Camera& camera)
+Player::render(Graphics& graphics, const Camera& camera)
 {
 	SDL_Rect cameraRect = camera.getViewRect();
 	SDL_Rect posToDraw;
@@ -59,8 +60,7 @@ Player::render(SDL_Renderer* renderer, const Camera& camera)
 	posToDraw.x = round(posX_) - cameraRect.x;
 	posToDraw.y = round(posY_) - cameraRect.y;
 
-	SDL_SetRenderDrawColor(renderer, 0xff, 0x00, 0x00, 0xff);
-	SDL_RenderFillRect(renderer, &posToDraw);
+	graphics.drawRect(posToDraw);
 }
 
 void

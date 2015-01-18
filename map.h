@@ -3,11 +3,13 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include <json/json.h>
 #include <SDL2/SDL.h>
 
 class Camera;
 class Controller;
+class Graphics;
 
 class MapLoader;
 class MapTileLayer;
@@ -34,17 +36,17 @@ class MapTileLayer
 {
 public:
 	MapTileLayer();
-	MapTileLayer(SDL_Renderer* renderer, const MapLoader& mapLoader,
+	MapTileLayer(Graphics& graphics, const MapLoader& mapLoader,
 		     const std::string& layerName);
 	MapTileLayer(const MapTileLayer& clone);
 	~MapTileLayer();
 
-	void load(SDL_Renderer* renderer, const MapLoader& mapLoader,
+	void load(Graphics& graphics, const MapLoader& mapLoader,
 		  const std::string& layerName);
 	void cleanUp();
 
 	void update();
-	void render(SDL_Renderer* SDL_Renderer, const Camera& camera);
+	void render(Graphics& graphics, const Camera& camera);
 
 	std::vector<SDL_Rect> getCollidedTiles(const SDL_Rect& rect) const;
 
@@ -59,7 +61,7 @@ private:
 	int tileWidth_, tileHeight_;
 
 	std::vector<Json::Value> tileSets_;
-	std::map<std::string, SDL_Texture*> tileImages_;
+	std::map<std::string, std::shared_ptr<SDL_Texture>> tileImages_;
 };
 
 class MapObjectLayer

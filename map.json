@@ -70,36 +70,6 @@
          "spacing":0,
          "tileheight":10,
          "tilewidth":10
-        }, 
-        {
-         "firstgid":3,
-         "image":"four.png",
-         "imageheight":20,
-         "imagewidth":20,
-         "margin":0,
-         "name":"four",
-         "properties":
-            {
-
-            },
-         "spacing":0,
-         "tileheight":10,
-         "tilewidth":10
-        }, 
-        {
-         "firstgid":7,
-         "image":"sewer.png",
-         "imageheight":16,
-         "imagewidth":16,
-         "margin":0,
-         "name":"sewer",
-         "properties":
-            {
-
-            },
-         "spacing":0,
-         "tileheight":10,
-         "tilewidth":10
         }],
  "tilewidth":10,
  "version":1,

@@ -12,6 +12,7 @@
 class Controller;
 class Camera;
 class MapTileLayer;
+class Graphics;
 
 enum PlayerState
 {
@@ -28,7 +29,7 @@ public:
 
 	void update(const Controller& controller,
 		    const MapTileLayer& tileLayer);
-	void render(SDL_Renderer* renderer, const Camera& camera);
+	void render(Graphics& graphics, const Camera& camera);
 
 	/* TODO Use DTO or something */
 	void setX(int x);

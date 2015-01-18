@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include "player.h"
+#include "graphics.h"
 
 #include "camera.h"
 
@@ -13,7 +14,7 @@ Camera::~Camera()
 }
 
 void
-Camera::setup(SDL_Renderer* renderer,
+Camera::setup(Graphics& graphics,
 	      int worldWidth, int worldHeight, int viewWidth, int viewHeight)
 {
 	worldRect_ = {
@@ -31,7 +32,7 @@ Camera::setup(SDL_Renderer* renderer,
 		40, 40
 	};
 
-	SDL_RenderSetLogicalSize(renderer, viewWidth, viewHeight);
+	graphics.setLogicalSize(viewWidth, viewHeight);
 }
 
 void
