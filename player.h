@@ -29,7 +29,7 @@ public:
 
 	void update(const Controller& controller,
 		    const MapTileLayer& tileLayer);
-	void render(Graphics& graphics, const Camera& camera);
+	void render(const Graphics& graphics, const Camera& camera);
 
 	/* TODO Use DTO or something */
 	void setX(int x);

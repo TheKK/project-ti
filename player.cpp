@@ -50,7 +50,7 @@ Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 }
 
 void
-Player::render(Graphics& graphics, const Camera& camera)
+Player::render(const Graphics& graphics, const Camera& camera)
 {
 	SDL_Rect cameraRect = camera.getViewRect();
 	SDL_Rect posToDraw;

@@ -37,7 +37,7 @@ public:
 	Controller();
 	~Controller();
 
-	void eventHandler(const SDL_Event* event);
+	void eventHandler(const SDL_Event& event);
 	void stateClear();
 
 	enum ButtonStates getButtonState(enum Buttons which) const;

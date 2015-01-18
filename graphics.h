@@ -16,14 +16,14 @@ public:
 	std::shared_ptr<SDL_Texture> loadSprite(const std::string& filePath);
 
 	void render(const std::shared_ptr<SDL_Texture>& source, SDL_Rect& clip,
-		    SDL_Rect& dest);
+		    SDL_Rect& dest) const;
 
-	void drawRect(SDL_Rect& dest);
+	void drawRect(SDL_Rect& dest) const;
 
-	void clear();
-	void present();
+	void clear() const;
+	void present() const;
 
-	void setLogicalSize(int w, int h);
+	void setLogicalSize(int w, int h) const;
 private:
 	SDL_Renderer* renderer_ = nullptr;
 

@@ -55,33 +55,33 @@ Graphics::loadSprite(const std::string& filePath)
 
 void
 Graphics::render(const std::shared_ptr<SDL_Texture>& source, SDL_Rect& clip,
-		 SDL_Rect& dest)
+		 SDL_Rect& dest) const
 {
 	SDL_RenderCopy(renderer_, source.get(), &clip, &dest);
 }
 
 void
-Graphics::drawRect(SDL_Rect& dest)
+Graphics::drawRect(SDL_Rect& dest) const
 {
 	SDL_SetRenderDrawColor(renderer_, 0xff, 0x00, 0x00, 0xff);
 	SDL_RenderFillRect(renderer_, &dest);
 }
 
 void
-Graphics::clear()
+Graphics::clear() const
 {
 	SDL_SetRenderDrawColor(renderer_, 0x33, 0x33, 0x33, 0xff);
 	SDL_RenderClear(renderer_);
 }
 
 void
-Graphics::present()
+Graphics::present() const
 {
 	SDL_RenderPresent(renderer_);
 }
 
 void
-Graphics::setLogicalSize(int w, int h)
+Graphics::setLogicalSize(int w, int h) const
 {
 	SDL_RenderSetLogicalSize(renderer_, w, h);
 }

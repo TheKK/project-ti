@@ -28,14 +28,14 @@ Controller::~Controller()
 }
 
 void
-Controller::eventHandler(const SDL_Event* event)
+Controller::eventHandler(const SDL_Event& event)
 {
-	switch (event->type) {
+	switch (event.type) {
 	case SDL_KEYDOWN:
-		if (event->key.repeat)
+		if (event.key.repeat)
 			break;
 
-		switch (event->key.keysym.scancode) {
+		switch (event.key.keysym.scancode) {
 		case SDL_SCANCODE_UP:
 			buttonState_[BUTTON_UP] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_UP] = true;
@@ -74,10 +74,10 @@ Controller::eventHandler(const SDL_Event* event)
 		break;
 
 	case SDL_KEYUP:
-		if (event->key.repeat)
+		if (event.key.repeat)
 			break;
 
-		switch (event->key.keysym.scancode) {
+		switch (event.key.keysym.scancode) {
 		case SDL_SCANCODE_UP:
 			buttonState_[BUTTON_UP] = BUTTON_STATE_RELEASED;
 			buttonReleased_[BUTTON_UP] = true;
@@ -116,7 +116,7 @@ Controller::eventHandler(const SDL_Event* event)
 		break;
 
 	case SDL_JOYBUTTONDOWN:
-		switch (event->jbutton.button) {
+		switch (event.jbutton.button) {
 		case 0:
 			buttonState_[BUTTON_X] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_X] = true;
@@ -147,7 +147,7 @@ Controller::eventHandler(const SDL_Event* event)
 		break;
 
 	case SDL_JOYBUTTONUP:
-		switch (event->jbutton.button) {
+		switch (event.jbutton.button) {
 		case 0:
 			buttonState_[BUTTON_X] = BUTTON_STATE_RELEASED;
 			buttonReleased_[BUTTON_X] = true;
@@ -178,7 +178,7 @@ Controller::eventHandler(const SDL_Event* event)
 		break;
 
 	case SDL_JOYHATMOTION:
-		switch (event->jhat.value) {
+		switch (event.jhat.value) {
 		case SDL_HAT_UP:
 			buttonState_[BUTTON_UP] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_UP] = true;
@@ -233,20 +233,20 @@ Controller::eventHandler(const SDL_Event* event)
 		break;
 
 	case SDL_JOYAXISMOTION:
-		if (event->jaxis.axis == 0) {
-			axis0_ = event->jaxis.value;
+		if (event.jaxis.axis == 0) {
+			axis0_ = event.jaxis.value;
 		}
-		if (event->jaxis.axis == 1) {
-			axis1_ = event->jaxis.value;
+		if (event.jaxis.axis == 1) {
+			axis1_ = event.jaxis.value;
 		}
 		break;
 
 	case SDL_JOYDEVICEADDED:
-		addJoystick_(event->jdevice.which);
+		addJoystick_(event.jdevice.which);
 		break;
 
 	case SDL_JOYDEVICEREMOVED:
-		removeJoystick_(event->jdevice.which);
+		removeJoystick_(event.jdevice.which);
 		break;
 	}
 }
