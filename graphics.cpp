@@ -4,20 +4,30 @@
 #include <stdexcept>
 #include <iostream>
 
+#include "window.h"
+
 #include "graphics.h"
 
+Graphics::~Graphics()
+{
+	IMG_Quit();
+}
+
 void
-Graphics::init(SDL_Window* window)
+Graphics::init(const Window& window)
 {
 	if (renderer_)
 		return;
 
 	renderer_ = SDL_CreateRenderer(
-		window,
+		window.getWindow(),
 		-1,
 		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!renderer_)
 		throw std::runtime_error(SDL_GetError());
+
+	if (IMG_Init(IMG_INIT_PNG) < 0)
+		throw std::runtime_error(IMG_GetError());
 }
 
 std::shared_ptr<SDL_Texture>

@@ -5,10 +5,14 @@
 #include <memory>
 #include <SDL2/SDL.h>
 
+class Window;
+
 class Graphics
 {
 public:
-	void init(SDL_Window* window);
+	~Graphics();
+
+	void init(const Window& window);
 	std::shared_ptr<SDL_Texture> loadSprite(const std::string& filePath);
 
 	void render(const std::shared_ptr<SDL_Texture>& source, SDL_Rect& clip,

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <stdexcept>
 
 #include "timer.h"
@@ -10,12 +9,15 @@
 #include "camera.h"
 #include "player.h"
 #include "graphics.h"
+#include "window.h"
+#include "sdlSystem.h"
 
 namespace
 {
 	const char kMapFile[] = "map.json";
 
-	SDL_Window* mainWindow = nullptr;
+	SDLSystem sdlSystem;
+	Window window;
 	Graphics graphics;
 	bool appIsRunning = true;
 
@@ -60,38 +62,10 @@ loadMap(const std::string& mapFile)
 	camera.lookAt(player);
 }
 
-int
-init()
-{
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-		return -1;
-
-	if (IMG_Init(IMG_INIT_PNG) < 0) {
-		std::cout << IMG_GetError() << "\n";
-		return -1;
-	}
-
-	mainWindow = SDL_CreateWindow(
-		"test",
-		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		600, 600,
-		SDL_WINDOW_SHOWN);
-	if (!mainWindow)
-		return -1;
-
-	graphics.init(mainWindow);
-
-	return 0;
-}
-
 void
 quit()
 {
-	SDL_DestroyWindow(mainWindow);
-	mainWindow = nullptr;
 
-	SDL_Quit();
-	IMG_Quit();
 }
 
 void
@@ -156,18 +130,18 @@ render()
 	graphics.present();
 }
 
+#include <memory>
 int
 main(int argc, char* argv[])
 {
-	SDL_Event event;
-	Timer timer;
-
-	if (init() < 0)
-		return 1;
-
-	loadMap("./map.json");
-
 	try {
+		SDL_Event event;
+		Timer timer;
+
+		graphics.init(window);
+
+		loadMap("./map.json");
+
 		while (appIsRunning) {
 			timer.start();
 
