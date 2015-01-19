@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <vector>
+
 #include "map.h"
 #include "sprite.h"
 #include "controller.h"
@@ -29,12 +31,10 @@ private:
 	MapTileLayer foreLayer_;
 	MapObjectLayer objectLayer_;
 
-	TransportEvent te_;
+	std::vector<Entity*> entities_;
 
 	Camera camera_;
-
 	Controller controller_;
-
 	Player player_;
 
 	void eventHandler_(const SDL_Event& event);

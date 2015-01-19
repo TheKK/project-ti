@@ -8,13 +8,13 @@
 Game::Game()
 {
 	graphics_.init(window_);
-
-	te_.setEventPosRect({400, 130, 10, 10});
-	te_.setTransportDestination(20, 10);
 }
 
 Game::~Game()
 {
+	for (auto& e : entities_)
+		delete e;
+	entities_.clear();
 }
 
 int
@@ -78,10 +78,15 @@ Game::update_()
 {
 	player_.update(controller_, backLayer_);
 	camera_.update();
-	te_.update(player_);
+
+	for (auto& e : entities_)
+		e->update(player_);
 
 	if (controller_.ifButtonPressed(BUTTON_START))
 		appIsRunning_ = false;
+
+	if (controller_.ifButtonPressed(BUTTON_SELECT))
+		loadMap_("./map.json");
 
 	controller_.stateClear();
 }
@@ -105,7 +110,8 @@ Game::render_()
 	player_.render(graphics_, camera_);
 	foreLayer_.render(graphics_, camera_);
 
-	te_.render(graphics_, camera_);
+	for (auto& e : entities_)
+		e->render(graphics_, camera_);
 
 	graphics_.present();
 }
@@ -119,18 +125,47 @@ Game::loadMap_(const std::string& mapFile)
 		    "Reload map file: %s", mapFile.c_str());
 	mapLoader.load(mapFile);
 
+	/* Graphics part */
 	backLayer_.cleanUp();
 	backLayer_.load(graphics_, mapLoader, "layer_one");
 
 	foreLayer_.cleanUp();
 	foreLayer_.load(graphics_, mapLoader, "layer_two");
 
+	/* Player part */
 	objectLayer_.cleanUp();
 	objectLayer_.load(mapLoader, "object");
 
-	const Json::Value& playerStart_ = objectLayer_.getObject("startPoint");
-	player_.setX(playerStart_["x"].asInt());
-	player_.setY(playerStart_["y"].asInt());
+	const Json::Value& playerStart = objectLayer_.getObject("startPoint");
+	player_.setX(playerStart["x"].asInt());
+	player_.setY(playerStart["y"].asInt());
+
+	/* Events part */ /* TODO This should not apear in loadMap_() */
+	objectLayer_.cleanUp();
+	objectLayer_.load(mapLoader, "events");
+
+	for (Entity* e : entities_)
+		delete e;
+	entities_.clear();
+
+	for (Json::Value& event : objectLayer_) {
+		if (event["name"].asString() == "transportEvent") {
+			SDL_Rect eventPosRect;
+			TransportEvent* te = new TransportEvent();
+
+			eventPosRect.x = event["x"].asInt();
+			eventPosRect.y = event["y"].asInt();
+			eventPosRect.w = event["width"].asInt();
+			eventPosRect.h = event["height"].asInt();
+
+			te->setEventPosRect(eventPosRect);
+			te->setTransportDestination(
+				atoi(event["properties"]["destX"].asCString()),
+				atoi(event["properties"]["destY"].asCString()));
+
+			entities_.push_back(te);
+		}
+	}
 
 	camera_.setup(graphics_,
 		     backLayer_.getMapWidth() * backLayer_.getTileWidth(),

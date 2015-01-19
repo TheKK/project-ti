@@ -319,6 +319,18 @@ MapObjectLayer::operator=(const Json::Value& target)
 	return *this;
 }
 
+Json::Value::iterator
+MapObjectLayer::begin()
+{
+	return layer_["objects"].begin();
+}
+
+Json::Value::iterator
+MapObjectLayer::end()
+{
+	return layer_["objects"].end();
+}
+
 void
 MapObjectLayer::load(const MapLoader& mapLoader,
 		     const std::string& layerName)
@@ -335,8 +347,6 @@ MapObjectLayer::cleanUp()
 const Json::Value&
 MapObjectLayer::getObject(const std::string& name)
 {
-	static Json::Value nullValue;
-
 	for (const Json::Value& e : layer_["objects"]) {
 		if (e["name"].asString() == name)
 			return e;

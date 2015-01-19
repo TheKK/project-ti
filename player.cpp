@@ -254,6 +254,8 @@ Player::updateY_(const MapTileLayer& tileLayer)
 	accY_ += kGravityAcc;
 
 	velY_ += accY_;
+	velY_ = std::min(velY_, 2 * kMoveMaxSpeedX);
+	velY_ = std::max(velY_, -2 * kMoveMaxSpeedX);
 
 	if (velY_ > 0.f) {
 		/* Test botton part first */

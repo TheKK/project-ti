@@ -73,6 +73,9 @@ public:
 
 	MapObjectLayer& operator=(const Json::Value& target);
 
+	Json::Value::iterator begin();
+	Json::Value::iterator end();
+
 	void load(const MapLoader& mapLoader,
 		  const std::string& layerName);
 	void cleanUp();
