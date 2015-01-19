@@ -27,6 +27,16 @@ Player::Player():
 	nextState_ = nullptr;
 }
 
+Player::Player(Graphics& graphics):
+	standSprite_(graphics, "./standSprite.png", {0, 0, 10, 10}),
+	posX_(10), posY_(10),
+	velX_(0), velY_(0),
+	accX_(0), accY_(0)
+{
+	currentState_ = &standingState_;
+	nextState_ = nullptr;
+}
+
 Player::~Player()
 {
 }
@@ -44,6 +54,8 @@ Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 		nextState_ = nullptr;
 	}
 
+	standSprite_.update();
+
 	updateX_(tileLayer);
 	updateY_(tileLayer);
 	checkWallAround_(tileLayer);
@@ -60,7 +72,7 @@ Player::render(const Graphics& graphics, const Camera& camera)
 	posToDraw.x = round(posX_) - cameraRect.x;
 	posToDraw.y = round(posY_) - cameraRect.y;
 
-	graphics.drawRect(posToDraw);
+	standSprite_.render(graphics, posToDraw);
 }
 
 void

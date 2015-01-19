@@ -61,6 +61,7 @@ private:
 	int tileWidth_, tileHeight_;
 
 	std::vector<Json::Value> tileSets_;
+	/* TODO Use Sprite class */
 	std::map<std::string, std::shared_ptr<SDL_Texture>> tileImages_;
 };
 

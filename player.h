@@ -8,6 +8,7 @@
 #include "standingState.h"
 #include "jumpingState.h"
 #include "fallingState.h"
+#include "sprite.h"
 
 class Controller;
 class Camera;
@@ -25,6 +26,7 @@ class Player
 {
 public:
 	Player();
+	Player(Graphics& graphics);
 	~Player();
 
 	void update(const Controller& controller,
@@ -56,6 +58,8 @@ private:
 	StandingState standingState_;
 	JumpingState jumpingState_;
 	FallingState fallingState_;
+
+	Sprite standSprite_;
 
 	float posX_, posY_;
 	float velX_, velY_;

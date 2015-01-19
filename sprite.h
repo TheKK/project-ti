@@ -3,30 +3,25 @@
 
 #include <SDL2/SDL.h>
 #include <string>
-#include <vector>
+#include <memory>
+
+class Graphics;
 
 class Sprite
 {
 public:
 	Sprite();
-	Sprite(SDL_Renderer* renderer, const std::string& filePath,
-	       int width, int height, int frameDuration);
+	Sprite(Graphics& graphics, const std::string& filePath,
+	       const SDL_Rect& clipRect);
 	~Sprite();
 
-	void init(SDL_Renderer* renderer, const std::string& filePath,
-		  int width, int height, int frameDuration);
+	void init(Graphics& graphics, const std::string& filePath,
+		  const SDL_Rect& clipRect);
 
 	void update();
-	void render(SDL_Renderer* renderer, const SDL_Rect* pos);
+	void render(const Graphics& graphics, SDL_Rect& dstRect);
 private:
-	SDL_Texture* spriteSheet_ = nullptr;
-	std::vector<SDL_Rect> clipRects_;
-
-	int currentFrame_ = 0;
-	int frameDuration_ = 0;
-	int framwDurationCounter_ = 0;
-
-	SDL_Texture* loadTexture_(SDL_Renderer* renderer,
-				  const std::string& filePath);
+	std::shared_ptr<SDL_Texture> spriteSheet_;
+	SDL_Rect clipRect_;
 };
 #endif /* SPRITE_H */

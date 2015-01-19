@@ -10,18 +10,19 @@ class Window;
 class Graphics
 {
 public:
+	Graphics(const Window& window);
 	~Graphics();
 
 	void init(const Window& window);
-	std::shared_ptr<SDL_Texture> loadSprite(const std::string& filePath);
+	void render(SDL_Texture* source,
+		    SDL_Rect& clipRect, SDL_Rect& dstRect) const;
 
-	void render(const std::shared_ptr<SDL_Texture>& source, SDL_Rect& clip,
-		    SDL_Rect& dest) const;
-
-	void drawRect(SDL_Rect& dest) const;
+	void drawRect(SDL_Rect& dstRect) const;
 
 	void clear() const;
 	void present() const;
+
+	std::shared_ptr<SDL_Texture> loadSprite(const std::string& filePath);
 
 	void setLogicalSize(int w, int h) const;
 private:

@@ -149,9 +149,6 @@ MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 
 		tileSets_.push_back(tileSet);
 		tileImages_[imageName] = graphics.loadSprite(imageName);
-		if (!tileImages_[imageName].get())
-			throw std::runtime_error("file not found");
-
 	}
 
 	/* Order from large to small, 10 , 5 , 3, 2 */
@@ -237,7 +234,7 @@ MapTileLayer::render(Graphics& graphics, const Camera& camera)
 			tileDst.w = tileWidth;
 			tileDst.h = tileHeight;
 
-			graphics.render(tileImage, tileClip, tileDst);
+			graphics.render(tileImage.get(), tileClip, tileDst);
 		}
 	}
 }

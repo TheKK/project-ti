@@ -8,6 +8,11 @@
 
 #include "graphics.h"
 
+Graphics::Graphics(const Window& window)
+{
+	init(window);
+}
+
 Graphics::~Graphics()
 {
 	IMG_Quit();
@@ -54,17 +59,17 @@ Graphics::loadSprite(const std::string& filePath)
 }
 
 void
-Graphics::render(const std::shared_ptr<SDL_Texture>& source, SDL_Rect& clip,
-		 SDL_Rect& dest) const
+Graphics::render(SDL_Texture* source,SDL_Rect& clipRect,
+		 SDL_Rect& dstRect) const
 {
-	SDL_RenderCopy(renderer_, source.get(), &clip, &dest);
+	SDL_RenderCopy(renderer_, source, &clipRect, &dstRect);
 }
 
 void
-Graphics::drawRect(SDL_Rect& dest) const
+Graphics::drawRect(SDL_Rect& dstRect) const
 {
 	SDL_SetRenderDrawColor(renderer_, 0xff, 0x00, 0x00, 0xff);
-	SDL_RenderFillRect(renderer_, &dest);
+	SDL_RenderFillRect(renderer_, &dstRect);
 }
 
 void
@@ -103,18 +108,22 @@ Graphics::loadTextureFromFile_(const std::string& filePath)
 
 	loadedImage = IMG_Load(fullPath.c_str());
 	if (loadedImage == nullptr) {
-		std::string errMsg("IMG error while opening: ");
+		std::string errMsg;
+
+		errMsg = "IMG error: ";
 		errMsg += IMG_GetError();
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, errMsg.c_str());
-		return nullptr;
+
+		throw std::runtime_error(errMsg);;
 	}
 
 	tex = SDL_CreateTextureFromSurface(renderer_, loadedImage);
 	if (tex == nullptr) {
-		std::string errMsg("SDL error while converting surface: ");
+		std::string errMsg;
+
+		errMsg = "SDL error: ";
 		errMsg += SDL_GetError();
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, errMsg.c_str());
-		return nullptr;
+
+		throw std::runtime_error(errMsg);;
 	}
 
 	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);

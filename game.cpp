@@ -5,9 +5,10 @@
 
 #include "game.h"
 
-Game::Game()
+Game::Game():
+	graphics_(window_),
+	player_(graphics_)
 {
-	graphics_.init(window_);
 }
 
 Game::~Game()
