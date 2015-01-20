@@ -238,6 +238,8 @@ MapTileLayer::render(Graphics& graphics, const Camera& camera)
 					.render(graphics, tileDst);
 			}
 
+				break;
+			}
 		}
 	}
 }
