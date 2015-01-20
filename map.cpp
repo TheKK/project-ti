@@ -124,7 +124,7 @@ MapTileLayer::MapTileLayer(const MapTileLayer& clone)
 	this->tileHeight_ = clone.tileHeight_;
 
 	this->tileSets_  = clone.tileSets_;
-	this->tileImages_ = clone.tileImages_;
+	this->tileSprites_ = clone.tileSprites_;
 }
 
 MapTileLayer::~MapTileLayer()
@@ -136,6 +136,11 @@ void
 MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 		   const std::string& layerName)
 {
+	/*
+	 * Here we suppose each tileset used by this tilelayer are all the
+	 * same size (tileWidth, tileHeight, etc).
+	 */
+
 	layer_ = mapLoader.getTileLayer(layerName);
 
 	tileWidth_ = mapLoader.getTileWidth();
@@ -144,14 +149,10 @@ MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 	mapWidth_ = layer_["width"].asInt();
 	mapHeight_ = layer_["height"].asInt();
 
-	for (auto& tileSet : mapLoader.getTileSets()) {
-		std::string imageName = tileSet["image"].asString();
-
+	for (auto& tileSet : mapLoader.getTileSets())
 		tileSets_.push_back(tileSet);
-		tileImages_[imageName] = graphics.loadSprite(imageName);
-	}
 
-	/* Order from large to small, 10 , 5 , 3, 2 */
+	/* "firstgid" order from large to small, 10 , 5 , 3, 2 */
 	std::sort(tileSets_.begin(), tileSets_.end(),
 		  [](const Json::Value& a, const Json::Value& b)
 		  {
@@ -160,6 +161,35 @@ MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 
 			  return gidA > gidB;
 		  });
+
+	/* Find out sprite sheet */
+	for (auto& tileSet : tileSets_) {
+		int tileRow, tileCol;
+		SDL_Rect tileClip;
+		std::string imageName;
+
+		imageName = tileSet["image"].asString();
+
+		tileRow =
+			tileSet["imageheight"].asInt() /
+			tileSet["tileheight"].asInt();
+		tileCol =
+			tileSet["imagewidth"].asInt() /
+			tileSet["tilewidth"].asInt();
+
+		/* Find sprite pos */
+		for (int row = 0; row < tileRow; ++row) {
+			for (int col = 0; col < tileCol; ++col) {
+				tileClip.x = col * tileWidth_;
+				tileClip.y = row * tileHeight_;
+				tileClip.w = tileWidth_;
+				tileClip.h = tileHeight_;
+
+				tileSprites_[imageName].emplace_back(
+					graphics, imageName, tileClip);
+			}
+		}
+	}
 }
 
 void
@@ -183,58 +213,31 @@ MapTileLayer::render(Graphics& graphics, const Camera& camera)
 
 	for (int y = 0; y < mapHeight; ++y) {
 		for (int x = 0; x < mapWidth; ++x) {
-			int startTileId, tileId;
-			int tileWidth, tileHeight;
-			int tileRow, tileCol;
-			std::shared_ptr<SDL_Texture> tileImage;
-			SDL_Rect tileClip, tileDst;
+			int tileId, firstTileId;
 
 			tileId = layer_["data"][mapWidth * y + x].asInt();
 			if (tileId == 0)
 				continue;
 
-			/* Find out sprite sheet */
-			for (auto& tileSet : tileSets_) {
-				startTileId = tileSet["firstgid"].asInt();
-				if (tileId < startTileId)
+			for (const auto& tileSet : tileSets_) {
+				SDL_Rect tileDst;
+				std::string imageName;
+
+				firstTileId = tileSet["firstgid"].asInt();
+				if (tileId < firstTileId)
 					continue;
 
-				tileImage =
-					tileImages_[tileSet["image"]
-					.asString()];
+				imageName = tileSet["image"].asString();
 
-				tileWidth = tileSet["tilewidth"].asInt();
-				tileHeight = tileSet["tileheight"].asInt();
+				tileDst.x = x * tileWidth_ - cameraRect.x;
+				tileDst.y = y * tileHeight_ - cameraRect.y;
+				tileDst.w = tileWidth_;
+				tileDst.h = tileHeight_;
 
-				tileRow =
-					tileSet["imageheight"].asInt() / 
-					tileSet["tileheight"].asInt();
-				tileCol =
-					tileSet["imagewidth"].asInt() / 
-					tileSet["tilewidth"].asInt();
-				break;
+				tileSprites_[imageName][tileId - firstTileId]
+					.render(graphics, tileDst);
 			}
 
-			/* Find sprite pos */
-			for (int row = 0; row < tileRow; ++row) {
-				for (int col = 0; col < tileCol; ++col) {
-					if ((tileId - startTileId) !=
-					    (row * tileCol + col))
-						continue;
-
-					tileClip.x = col * tileWidth;
-					tileClip.y = row * tileHeight;
-					tileClip.w = tileWidth;
-					tileClip.h = tileHeight;
-				}
-			}
-
-			tileDst.x = x * tileWidth - cameraRect.x;
-			tileDst.y = y * tileHeight - cameraRect.y;
-			tileDst.w = tileWidth;
-			tileDst.h = tileHeight;
-
-			graphics.render(tileImage.get(), tileClip, tileDst);
 		}
 	}
 }
@@ -255,7 +258,7 @@ MapTileLayer::getCollidedTiles(const SDL_Rect& rect) const
 			/* TODO
 			 * Now return only solid tile, maybe not the
 			 * best way
-			 * */
+			 */
 			if (layer_["data"][row * mapWidth_ + col] == 0)
 				continue;
 

@@ -7,6 +7,8 @@
 #include <json/json.h>
 #include <SDL2/SDL.h>
 
+#include "sprite.h"
+
 class Camera;
 class Controller;
 class Graphics;
@@ -62,7 +64,7 @@ private:
 
 	std::vector<Json::Value> tileSets_;
 	/* TODO Use Sprite class */
-	std::map<std::string, std::shared_ptr<SDL_Texture>> tileImages_;
+	std::map<std::string, std::vector<Sprite>> tileSprites_;
 };
 
 class MapObjectLayer
