@@ -11,7 +11,7 @@
 #include "graphics.h"
 #include "window.h"
 #include "sdlSystem.h"
-#include "transportEvent.h"
+#include "entity.h"
 
 class Game
 {

@@ -40,11 +40,14 @@ public:
 	void setAccY(float accY);
 	void setVelX(float velX);
 	void setVelY(float velY);
+	void setCheckpoint(int x, int y);
 
 	int getVelX() const;
 	int getVelY() const;
 
 	void setNextState(enum PlayerState nextState);
+
+	void suicide();
 
 	bool isOnGround() const;
 	bool isBesideRightWall() const;
@@ -64,6 +67,8 @@ private:
 	float posX_, posY_;
 	float velX_, velY_;
 	float accX_, accY_;
+	
+	int checkPointX_, checkPointY_;
 
 	bool isBesideRightWall_ = false;
 	bool isBesideLeftWall_ = false;

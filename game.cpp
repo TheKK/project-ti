@@ -2,14 +2,16 @@
 #include <stdexcept>
 
 #include "timer.h"
+#include "transportEvent.h"
+#include "deadlyFloor.h"
 
 #include "game.h"
 
 namespace
 {
 	const std::vector<std::string> kGameMaps = {
-		"./map.json",
-		"./newMap.json"
+		"map.json",
+		"newMap.json"
 	};
 
 	const int kCameraWidth = 150;
@@ -159,26 +161,42 @@ Game::loadMap_(const std::string& mapFile)
 	objectLayer.load(mapLoader, "events");
 
 	for (Json::Value& event : objectLayer) {
+		if (event["name"].asString() == "startPoint") {
+			player_.setX(event["x"].asInt());
+			player_.setY(event["y"].asInt());
+			player_.setCheckpoint(event["x"].asInt(),
+					      event["x"].asInt());
+		}
+
 		if (event["name"].asString() == "transportEvent") {
 			SDL_Rect eventPosRect;
-			TransportEvent* te = new TransportEvent();
+			TransportEvent* transportEvent = new TransportEvent();
 
 			eventPosRect.x = event["x"].asInt();
 			eventPosRect.y = event["y"].asInt();
 			eventPosRect.w = event["width"].asInt();
 			eventPosRect.h = event["height"].asInt();
 
-			te->setEventPosRect(eventPosRect);
-			te->setTransportDestination(
+			transportEvent->setEventPosRect(eventPosRect);
+			transportEvent->setTransportDestination(
 				atoi(event["properties"]["destX"].asCString()),
 				atoi(event["properties"]["destY"].asCString()));
 
-			entities_.push_back(te);
+			entities_.push_back(transportEvent);
 		}
 
-		if (event["name"].asString() == "startPoint") {
-			player_.setX(event["x"].asInt());
-			player_.setY(event["y"].asInt());
+		if (event["name"].asString() == "deadlyFloor") {
+			SDL_Rect floorPosRect;
+			DeadlyFloor* deadlyFloor = nullptr;
+
+			floorPosRect.x = event["x"].asInt();
+			floorPosRect.y = event["y"].asInt();
+			floorPosRect.w = event["width"].asInt();
+			floorPosRect.h = event["height"].asInt();
+
+			deadlyFloor = new DeadlyFloor(graphics_, floorPosRect);
+
+			entities_.push_back(deadlyFloor);
 		}
 	}
 

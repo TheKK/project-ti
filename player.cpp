@@ -13,6 +13,8 @@ namespace
 	const int kPlayerWidth = 10;
 	const int kPlayerHeight = 10;
 
+	const std::string kSpriteName = "standSprite.png";
+
 	const float kMoveMaxSpeedX = 2.5f;
 
 	const float kGravityAcc = 0.11f;
@@ -28,7 +30,7 @@ Player::Player():
 }
 
 Player::Player(Graphics& graphics):
-	standSprite_(graphics, "./standSprite.png", {0, 0, 10, 10}),
+	standSprite_(graphics, kSpriteName, {0, 0, 10, 10}),
 	posX_(10), posY_(10),
 	velX_(0), velY_(0),
 	accX_(0), accY_(0)
@@ -110,6 +112,13 @@ Player::setVelY(float velY)
 	velY_ = velY;
 }
 
+void
+Player::setCheckpoint(int x, int y)
+{
+	checkPointX_ = x;
+	checkPointY_ = y;
+}
+
 int
 Player::getVelX() const
 {
@@ -139,6 +148,18 @@ Player::setNextState(enum PlayerState nextState)
 		nextState_ = nullptr;
 		break;
 	};
+}
+
+void
+Player::suicide()
+{
+	posX_ = checkPointX_;
+	posY_ = checkPointY_;
+
+	velX_ = 0;
+	velY_ = 0;
+	accX_ = 0;
+	accY_ = 0;
 }
 
 bool
