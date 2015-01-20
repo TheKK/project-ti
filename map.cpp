@@ -35,14 +35,17 @@ MapLoader::load(const std::string& filePath)
 		fd.close();
 		throw std::runtime_error(reader.getFormattedErrorMessages());
 	}
+
+	mapName_ = filePath;
 }
 
 const Json::Value&
 MapLoader::getTileLayer(const std::string& layerName) const
 {
 	if (mapData_["layers"].isNull())
-		throw std::runtime_error(
-			"No such object 'layers' in map file, it's borken");
+		throw std::runtime_error("No object 'layers' in map file, "
+					 "map file '" + mapName_ +
+					 "' is broken");
 
 	for (auto& layer : mapData_["layers"]) {
 		if ((layer["name"].asString() == layerName) &&
@@ -50,15 +53,17 @@ MapLoader::getTileLayer(const std::string& layerName) const
 			return layer;
 	}
 
-	throw std::runtime_error("No such layer in map file");
+	throw std::runtime_error("No tile layer named '" + layerName +
+				 "' in map file: " + mapName_);
 }
 
 const Json::Value&
 MapLoader::getObjectLayer(const std::string& layerName) const
 {
 	if (mapData_["layers"].isNull())
-		throw std::runtime_error(
-			"No such object 'layers' in map file, it's borken");
+		throw std::runtime_error("No object 'layers' in map file, "
+					 "map file '" + mapName_ +
+					 "' is broken");
 
 	for (auto& layer : mapData_["layers"]) {
 		if ((layer["name"].asString() == layerName) &&
@@ -66,7 +71,8 @@ MapLoader::getObjectLayer(const std::string& layerName) const
 			return layer;
 	}
 
-	throw std::runtime_error("No such layer in map file");
+	throw std::runtime_error("No object layer named '" + layerName +
+				 "' in map file: " + mapName_);
 }
 
 const Json::Value&
@@ -75,8 +81,9 @@ MapLoader::getTileSets() const
 	const Json::Value& tileSetsToReturn = mapData_["tilesets"];
 
 	if (tileSetsToReturn.isNull())
-		throw std::runtime_error(
-			"No such object 'tilesets' in map file, it's borken");
+		throw std::runtime_error("No object 'tilesets' in map file, "
+					 "map file '" + mapName_ +
+					 "' is broken");
 
 	return tileSetsToReturn;
 }
@@ -195,6 +202,7 @@ MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 void
 MapTileLayer::cleanUp()
 {
+	tileSprites_.clear();
 }
 
 void
@@ -205,17 +213,20 @@ MapTileLayer::update()
 void
 MapTileLayer::render(Graphics& graphics, const Camera& camera)
 {
-	int mapWidth, mapHeight;
-	const SDL_Rect& cameraRect = camera.getViewRect();
+	int leftBorder = std::floor((float)camera.getLeft() /
+				    (float)tileWidth_);
+	int rightBorder = std::floor((float)camera.getRight() /
+				     (float)tileWidth_);
+	int topBorder = std::floor((float)camera.getTop() /
+				   (float)tileHeight_);
+	int bottomBorder = std::floor((float)camera.getBottom() /
+				      (float)tileHeight_);
 
-	mapWidth = layer_["width"].asInt();
-	mapHeight = layer_["height"].asInt();
-
-	for (int y = 0; y < mapHeight; ++y) {
-		for (int x = 0; x < mapWidth; ++x) {
+	for (int y = topBorder; y <= bottomBorder; ++y) {
+		for (int x = leftBorder; x <= rightBorder; ++x) {
 			int tileId, firstTileId;
 
-			tileId = layer_["data"][mapWidth * y + x].asInt();
+			tileId = layer_["data"][mapWidth_ * y + x].asInt();
 			if (tileId == 0)
 				continue;
 
@@ -229,14 +240,13 @@ MapTileLayer::render(Graphics& graphics, const Camera& camera)
 
 				imageName = tileSet["image"].asString();
 
-				tileDst.x = x * tileWidth_ - cameraRect.x;
-				tileDst.y = y * tileHeight_ - cameraRect.y;
+				tileDst.x = x * tileWidth_ - camera.getLeft();
+				tileDst.y = y * tileHeight_ - camera.getTop();
 				tileDst.w = tileWidth_;
 				tileDst.h = tileHeight_;
 
 				tileSprites_[imageName][tileId - firstTileId]
 					.render(graphics, tileDst);
-			}
 
 				break;
 			}
@@ -354,5 +364,6 @@ MapObjectLayer::getObject(const std::string& name)
 			return e;
 	}
 
-	throw std::runtime_error("No such object in this object layer");
+	throw std::runtime_error("No object named '" + name + "' in layer '" +
+				 layer_["name"].asString() + "'");
 }

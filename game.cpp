@@ -5,6 +5,17 @@
 
 #include "game.h"
 
+namespace
+{
+	const std::vector<std::string> kGameMaps = {
+		"./map.json",
+		"./newMap.json"
+	};
+
+	const int kCameraWidth = 150;
+	const int kCameraHeight = 150;
+}
+
 Game::Game():
 	graphics_(window_),
 	player_(graphics_)
@@ -26,6 +37,7 @@ Game::execute()
 
 	graphics_.init(window_);
 
+	cleanMap_();
 	loadMap_("./map.json");
 
 	while (appIsRunning_) {
@@ -59,16 +71,9 @@ Game::eventHandler_(const SDL_Event& event)
 	case SDL_KEYDOWN:
 		if (event.key.repeat)
 			break;
-
-		switch (event.key.keysym.scancode) {
-		case SDL_SCANCODE_R:
-			loadMap_("./map.json");
-			break;
-		default:
-			break;
-		};
 		break;
 	case SDL_DROPFILE:
+		cleanMap_();
 		loadMap_(event.drop.file);
 		break;
 	};
@@ -86,8 +91,10 @@ Game::update_()
 	if (controller_.ifButtonPressed(BUTTON_START))
 		appIsRunning_ = false;
 
-	if (controller_.ifButtonPressed(BUTTON_SELECT))
+	if (controller_.ifButtonPressed(BUTTON_SELECT)) {
+		cleanMap_();
 		loadMap_("./map.json");
+	}
 
 	controller_.stateClear();
 }
@@ -96,16 +103,6 @@ void
 Game::render_()
 {
 	graphics_.clear();
-
-	//SDL_Rect viewport;
-
-	//viewport.x = 0;
-	//viewport.y = 0;
-	//viewport.w = backLayer_.getTileWidth() * backLayer_.getMapWidth();
-	//viewport.h = backLayer_.getTileHeight() * backLayer_.getMapHeight();
-
-	//SDL_SetRenderDrawColor(graphics, 0x44, 0x33, 0x33, 0xff);
-	//SDL_RenderFillRect(graphics, &viewport);
 
 	backLayer_.render(graphics_, camera_);
 	player_.render(graphics_, camera_);
@@ -118,38 +115,33 @@ Game::render_()
 }
 
 void
-Game::loadMap_(const std::string& mapFile)
+Game::cleanMap_()
 {
-	MapLoader mapLoader;
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Clean map");
 
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-		    "Reload map file: %s", mapFile.c_str());
-	mapLoader.load(mapFile);
-
-	/* Graphics part */
 	backLayer_.cleanUp();
-	backLayer_.load(graphics_, mapLoader, "layer_one");
-
 	foreLayer_.cleanUp();
-	foreLayer_.load(graphics_, mapLoader, "layer_two");
-
-	/* Player part */
-	objectLayer_.cleanUp();
-	objectLayer_.load(mapLoader, "object");
-
-	const Json::Value& playerStart = objectLayer_.getObject("startPoint");
-	player_.setX(playerStart["x"].asInt());
-	player_.setY(playerStart["y"].asInt());
-
-	/* Events part */ /* TODO This should not apear in loadMap_() */
-	objectLayer_.cleanUp();
-	objectLayer_.load(mapLoader, "events");
 
 	for (Entity* e : entities_)
 		delete e;
 	entities_.clear();
+}
 
-	for (Json::Value& event : objectLayer_) {
+void
+Game::loadMap_(const std::string& mapFile)
+{
+	MapLoader mapLoader;
+	MapObjectLayer objectLayer;
+
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+		    "Reload map file: %s", mapFile.c_str());
+
+	mapLoader.load(mapFile);
+	backLayer_.load(graphics_, mapLoader, "layer_one");
+	foreLayer_.load(graphics_, mapLoader, "layer_two");
+	objectLayer.load(mapLoader, "events");
+
+	for (Json::Value& event : objectLayer) {
 		if (event["name"].asString() == "transportEvent") {
 			SDL_Rect eventPosRect;
 			TransportEvent* te = new TransportEvent();
@@ -166,12 +158,16 @@ Game::loadMap_(const std::string& mapFile)
 
 			entities_.push_back(te);
 		}
+
+		if (event["name"].asString() == "startPoint") {
+			player_.setX(event["x"].asInt());
+			player_.setY(event["y"].asInt());
+		}
 	}
 
 	camera_.setup(graphics_,
 		     backLayer_.getMapWidth() * backLayer_.getTileWidth(),
 		     backLayer_.getMapHeight() * backLayer_.getTileHeight(),
-		     //200, 200);
-		     150, 150);
+		     kCameraWidth, kCameraHeight);
 	camera_.lookAt(player_);
 }

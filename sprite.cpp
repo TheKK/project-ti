@@ -24,15 +24,22 @@ Sprite::init(Graphics& graphics, const std::string& filePath,
 	     const SDL_Rect& clipRect)
 {
 	spriteSheet_ = graphics.loadSprite(filePath);
-	clipRect_ = clipRect;
+	SDL_assert(spriteSheet_.get() != nullptr);
+
+	clipRect_.x = clipRect.x;
+	clipRect_.y = clipRect.y;
+	clipRect_.w = clipRect.w;
+	clipRect_.h = clipRect.h;
 }
 void
 Sprite::update()
 {
+	SDL_assert(spriteSheet_.get() != nullptr);
 }
 
 void
 Sprite::render(const Graphics& graphics, SDL_Rect& dstRect)
 {
+	SDL_assert(spriteSheet_.get() != nullptr);
 	graphics.render(spriteSheet_.get(), clipRect_, dstRect);
 }

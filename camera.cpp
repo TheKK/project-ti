@@ -79,10 +79,28 @@ Camera::update()
 	viewRect_.y = std::min(viewRect_.y, worldRect_.h - viewRect_.h);
 }
 
-const SDL_Rect&
-Camera::getViewRect() const
+int
+Camera::getLeft() const
 {
-	return viewRect_;
+	return viewRect_.x;
+}
+
+int
+Camera::getRight() const
+{
+	return viewRect_.x + viewRect_.w - 1;
+}
+
+int
+Camera::getTop() const
+{
+	return viewRect_.y;
+}
+
+int
+Camera::getBottom() const
+{
+	return viewRect_.y + viewRect_.h - 1;
 }
 
 void

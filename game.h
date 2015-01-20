@@ -29,7 +29,6 @@ private:
 
 	MapTileLayer backLayer_;
 	MapTileLayer foreLayer_;
-	MapObjectLayer objectLayer_;
 
 	std::vector<Entity*> entities_;
 
@@ -41,6 +40,7 @@ private:
 	void update_();
 	void render_();
 
+	void cleanMap_();
 	void loadMap_(const std::string& filePath);
 };
 

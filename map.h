@@ -31,6 +31,7 @@ public:
 	int getTileWidth() const;
 	int getTileheight() const;
 private:
+	std::string mapName_;
 	Json::Value mapData_;
 };
 

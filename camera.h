@@ -18,7 +18,10 @@ public:
 
 	void update();
 
-	const SDL_Rect& getViewRect() const;
+	int getLeft() const;
+	int getRight() const;
+	int getTop() const;
+	int getBottom() const;
 
 	void lookAt(const Player& target);
 private:

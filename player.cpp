@@ -64,13 +64,12 @@ Player::update(const Controller& controller, const MapTileLayer& tileLayer)
 void
 Player::render(const Graphics& graphics, const Camera& camera)
 {
-	SDL_Rect cameraRect = camera.getViewRect();
 	SDL_Rect posToDraw;
 
 	posToDraw.w = kPlayerWidth;
 	posToDraw.h = kPlayerHeight;
-	posToDraw.x = round(posX_) - cameraRect.x;
-	posToDraw.y = round(posY_) - cameraRect.y;
+	posToDraw.x = round(posX_) - camera.getLeft();
+	posToDraw.y = round(posY_) - camera.getTop();
 
 	standSprite_.render(graphics, posToDraw);
 }
