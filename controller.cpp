@@ -2,11 +2,6 @@
 
 #include "controller.h"
 
-namespace
-{
-	const int16_t kJoyAxisThreshold = 1000;
-}
-
 Controller::Controller()
 {
 	for (auto& e : buttonState_)
@@ -133,6 +128,14 @@ Controller::eventHandler(const SDL_Event& event)
 			buttonState_[BUTTON_Y] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_Y] = true;
 			break;
+		case 4:
+			buttonState_[BUTTON_L] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_L] = true;
+			break;
+		case 5:
+			buttonState_[BUTTON_R] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_R] = true;
+			break;
 		case 8:
 			buttonState_[BUTTON_SELECT] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_SELECT] = true;
@@ -163,6 +166,14 @@ Controller::eventHandler(const SDL_Event& event)
 		case 3:
 			buttonState_[BUTTON_Y] = BUTTON_STATE_RELEASED;
 			buttonReleased_[BUTTON_Y] = true;
+			break;
+		case 4:
+			buttonState_[BUTTON_L] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_L] = true;
+			break;
+		case 5:
+			buttonState_[BUTTON_R] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_R] = true;
 			break;
 		case 8:
 			buttonState_[BUTTON_SELECT] = BUTTON_STATE_RELEASED;
