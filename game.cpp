@@ -18,7 +18,8 @@ namespace
 
 Game::Game():
 	graphics_(window_),
-	player_(graphics_)
+	player_(graphics_),
+	currentMap_(0)
 {
 }
 
@@ -82,19 +83,35 @@ Game::eventHandler_(const SDL_Event& event)
 void
 Game::update_()
 {
-	player_.update(controller_, backLayer_);
-	camera_.update();
-
-	for (auto& e : entities_)
-		e->update(player_);
-
 	if (controller_.ifButtonPressed(BUTTON_START))
 		appIsRunning_ = false;
 
 	if (controller_.ifButtonPressed(BUTTON_SELECT)) {
 		cleanMap_();
-		loadMap_("./map.json");
+		loadMap_(kGameMaps[currentMap_]);
 	}
+
+	if (controller_.ifButtonPressed(BUTTON_R)) {
+		++currentMap_;
+		if (currentMap_ == kGameMaps.size())
+			currentMap_ = 0;
+		cleanMap_();
+		loadMap_(kGameMaps[currentMap_]);
+	}
+
+	if (controller_.ifButtonPressed(BUTTON_L)) {
+		--currentMap_;
+		if (currentMap_ < 0)
+			currentMap_ = kGameMaps.size() - 1;
+		cleanMap_();
+		loadMap_(kGameMaps[currentMap_]);
+	}
+
+	player_.update(controller_, backLayer_);
+	camera_.update();
+
+	for (auto& e : entities_)
+		e->update(player_);
 
 	controller_.stateClear();
 }

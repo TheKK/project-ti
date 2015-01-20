@@ -202,6 +202,7 @@ MapTileLayer::load(Graphics& graphics, const MapLoader& mapLoader,
 void
 MapTileLayer::cleanUp()
 {
+	tileSets_.clear();
 	tileSprites_.clear();
 }
 

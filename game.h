@@ -36,6 +36,8 @@ private:
 	Controller controller_;
 	Player player_;
 
+	int currentMap_;
+
 	void eventHandler_(const SDL_Event& event);
 	void update_();
 	void render_();
