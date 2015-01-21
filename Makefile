@@ -11,5 +11,16 @@ $(OUT_EXE): $(OBJ)
 %.o: %.cpp
 	$(CXX) $^ -std=c++14 -g -c -o $@
 
+.PHONY: clean
 clean:
 	@rm -frv $(OBJ) $(OUT_EXE)
+
+todo:
+	@echo "[TODO]"
+	@grep -r TODO .
+	@echo
+	@echo "[FIXME]"
+	@grep -r FIXME .
+	@echo
+	@echo "[XXX]"
+	@grep -r XXX .
