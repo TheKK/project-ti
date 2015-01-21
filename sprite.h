@@ -15,7 +15,7 @@ public:
 	       const SDL_Rect& clipRect);
 	~Sprite();
 
-	void init(Graphics& graphics, const std::string& filePath,
+	void load(Graphics& graphics, const std::string& filePath,
 		  const SDL_Rect& clipRect);
 
 	void update();

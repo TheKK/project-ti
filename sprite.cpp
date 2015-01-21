@@ -12,7 +12,7 @@ Sprite::Sprite()
 Sprite::Sprite(Graphics& graphics, const std::string& filePath,
 	       const SDL_Rect& clipRect)
 {
-	init(graphics, filePath, clipRect);
+	load(graphics, filePath, clipRect);
 }
 
 Sprite::~Sprite()
@@ -20,11 +20,10 @@ Sprite::~Sprite()
 }
 
 void
-Sprite::init(Graphics& graphics, const std::string& filePath,
+Sprite::load(Graphics& graphics, const std::string& filePath,
 	     const SDL_Rect& clipRect)
 {
 	spriteSheet_ = graphics.loadSprite(filePath);
-	SDL_assert(spriteSheet_.get() != nullptr);
 
 	clipRect_.x = clipRect.x;
 	clipRect_.y = clipRect.y;
@@ -34,12 +33,10 @@ Sprite::init(Graphics& graphics, const std::string& filePath,
 void
 Sprite::update()
 {
-	SDL_assert(spriteSheet_.get() != nullptr);
 }
 
 void
 Sprite::render(const Graphics& graphics, SDL_Rect& dstRect)
 {
-	SDL_assert(spriteSheet_.get() != nullptr);
 	graphics.render(spriteSheet_.get(), clipRect_, dstRect);
 }
