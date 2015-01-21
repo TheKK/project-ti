@@ -38,6 +38,8 @@ private:
 
 	int currentMap_;
 
+	int bulletTimeCounter_;
+
 	void eventHandler_(const SDL_Event& event);
 	void update_();
 	void render_();

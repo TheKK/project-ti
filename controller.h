@@ -20,6 +20,8 @@ enum Buttons
 	BUTTON_L,
 	BUTTON_R,
 
+	BUTTON_L2,
+
 	BUTTON_START,
 	BUTTON_SELECT,
 

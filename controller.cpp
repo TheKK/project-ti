@@ -136,6 +136,10 @@ Controller::eventHandler(const SDL_Event& event)
 			buttonState_[BUTTON_R] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_R] = true;
 			break;
+		case 6:
+			buttonState_[BUTTON_L2] = BUTTON_STATE_PRESSED;
+			buttonPressed_[BUTTON_L2] = true;
+			break;
 		case 8:
 			buttonState_[BUTTON_SELECT] = BUTTON_STATE_PRESSED;
 			buttonPressed_[BUTTON_SELECT] = true;
@@ -174,6 +178,10 @@ Controller::eventHandler(const SDL_Event& event)
 		case 5:
 			buttonState_[BUTTON_R] = BUTTON_STATE_RELEASED;
 			buttonReleased_[BUTTON_R] = true;
+			break;
+		case 6:
+			buttonState_[BUTTON_L2] = BUTTON_STATE_RELEASED;
+			buttonReleased_[BUTTON_L2] = true;
 			break;
 		case 8:
 			buttonState_[BUTTON_SELECT] = BUTTON_STATE_RELEASED;

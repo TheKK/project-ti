@@ -16,6 +16,8 @@ namespace
 
 	const int kCameraWidth = 150;
 	const int kCameraHeight = 150;
+
+	const int kBulletTimeMax = 2;
 }
 
 Game::Game():
@@ -85,6 +87,14 @@ Game::eventHandler_(const SDL_Event& event)
 void
 Game::update_()
 {
+	if (controller_.getButtonState(BUTTON_L2)) {
+		++bulletTimeCounter_;
+		if (bulletTimeCounter_ < kBulletTimeMax)
+			return;
+		else
+			bulletTimeCounter_ = 0;
+	}
+
 	if (controller_.ifButtonPressed(BUTTON_START))
 		appIsRunning_ = false;
 
@@ -165,7 +175,7 @@ Game::loadMap_(const std::string& mapFile)
 			player_.setX(event["x"].asInt());
 			player_.setY(event["y"].asInt());
 			player_.setCheckpoint(event["x"].asInt(),
-					      event["x"].asInt());
+					      event["y"].asInt());
 		}
 
 		if (event["name"].asString() == "transportEvent") {
