@@ -14,6 +14,7 @@ Game::Game():
 
 Game::~Game()
 {
+	GameSceneManager::quit();
 }
 
 int
@@ -23,7 +24,7 @@ Game::execute()
 	Timer timer;
 	GameScene& currentScene = GameSceneManager::currentScene(graphics_);
 
-	while (appIsRunning_) {
+	while (GameSceneManager::isRunning()) {
 		timer.start();
 		currentScene = GameSceneManager::currentScene(graphics_);
 

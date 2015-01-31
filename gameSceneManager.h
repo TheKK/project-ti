@@ -3,8 +3,20 @@
 
 #include <stack>
 
-class GameScene;
+#include "gameScene.h"
+
 class Graphics;
+
+class Null_gameScene : public GameScene
+{
+public:
+	virtual ~Null_gameScene() override {};
+
+	virtual void eventHandler(Graphics& graphics,
+				  const SDL_Event& event) override {};
+	virtual void update(Graphics& graphics) override {};
+	virtual void render(Graphics& graphics) override {};
+};
 
 enum TotalGameScene
 {
@@ -18,13 +30,21 @@ class GameSceneManager
 public:
 	static GameScene& currentScene(Graphics& graphics);
 	static void pushScene(Graphics& graphics, enum TotalGameScene which);
-	static void swapScene(Graphics& graphics, enum TotalGameScene toWhich);
+	static void changeScene(Graphics& graphics,
+				enum TotalGameScene toWhich);
+
+	static void shutdown();
+	static bool isRunning();
+
+	static void quit();
 private:
 	GameSceneManager();
 	~GameSceneManager();
 
-	static enum TotalGameScene swapTarget_;
+	static bool isRunning_;
+	static enum TotalGameScene sceneToChangeTo_;
 	static std::stack<GameScene*> gameSceneStack_;
+	static Null_gameScene null_gameScene_;
 };
 
 #endif /* GAME_SCENE_MANAGER_H */

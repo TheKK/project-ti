@@ -15,8 +15,6 @@ public:
 
 	int execute();
 private:
-	bool appIsRunning_ = true;
-
 	SDLSystem sdlSystem_;
 	Window window_;
 	Graphics graphics_;

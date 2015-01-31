@@ -2,19 +2,24 @@
 
 #include "gameSceneManager.h"
 
-enum TotalGameScene GameSceneManager::swapTarget_;
+bool GameSceneManager::isRunning_ = true;
+enum TotalGameScene GameSceneManager::sceneToChangeTo_;
 std::stack<GameScene*> GameSceneManager::gameSceneStack_;
+Null_gameScene GameSceneManager::null_gameScene_;
 
 GameScene&
 GameSceneManager::currentScene(Graphics& graphics)
 {
-	if (swapTarget_ != NULL_SCENE) {
+	if (sceneToChangeTo_ != NULL_SCENE) {
 		gameSceneStack_.pop();
-		pushScene(graphics, swapTarget_);
-		swapTarget_ = NULL_SCENE;
+		pushScene(graphics, sceneToChangeTo_);
+		sceneToChangeTo_ = NULL_SCENE;
 	}
 
-	return *gameSceneStack_.top();
+	if (gameSceneStack_.size() > 0)
+		return *gameSceneStack_.top();
+	else
+		return null_gameScene_;
 }
 
 void
@@ -34,7 +39,28 @@ GameSceneManager::pushScene(Graphics& graphics, enum TotalGameScene which)
 }
 
 void
-GameSceneManager::swapScene(Graphics& graphics, enum TotalGameScene toWhich)
+GameSceneManager::changeScene(Graphics& graphics, enum TotalGameScene toWhich)
 {
-	swapTarget_ = toWhich;
+	sceneToChangeTo_ = toWhich;
+}
+
+void
+GameSceneManager::shutdown()
+{
+	isRunning_ = false;
+}
+
+bool
+GameSceneManager::isRunning()
+{
+	return isRunning_;
+}
+
+void
+GameSceneManager::quit()
+{
+	while (!gameSceneStack_.empty()) {
+		delete gameSceneStack_.top();
+		gameSceneStack_.pop();
+	}
 }

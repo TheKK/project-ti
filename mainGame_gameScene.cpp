@@ -2,6 +2,7 @@
 
 #include "transportEvent.h"
 #include "deadlyFloor.h"
+#include "gameSceneManager.h"
 
 #include "mainGame_gameScene.h"
 
@@ -40,8 +41,7 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 
 	switch (event.type) {
 	case SDL_QUIT:
-		/* FIXME Bad hack */
-		throw std::runtime_error("I'm really sorry for this");
+		GameSceneManager::shutdown();
 		break;
 	case SDL_KEYDOWN:
 		if (event.key.repeat)
@@ -65,9 +65,8 @@ MainGame_GameScene::update(Graphics& graphics)
 			bulletTimeCounter_ = 0;
 	}
 
-	/* FIXME Bad hack */
 	if (controller_.ifButtonPressed(BUTTON_START))
-		throw std::runtime_error("I'm really sorry for this");
+		GameSceneManager::shutdown();
 
 	if (controller_.ifButtonPressed(BUTTON_SELECT)) {
 		cleanMap_();
