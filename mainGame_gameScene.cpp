@@ -29,9 +29,6 @@ MainGame_GameScene::MainGame_GameScene(Graphics& graphics):
 
 MainGame_GameScene::~MainGame_GameScene()
 {
-	for (auto& e : entities_)
-		delete e;
-	entities_.clear();
 }
 
 void
@@ -121,8 +118,6 @@ MainGame_GameScene::cleanMap_()
 	backLayer_.cleanUp();
 	foreLayer_.cleanUp();
 
-	for (Entity* e : entities_)
-		delete e;
 	entities_.clear();
 }
 
@@ -150,7 +145,8 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 
 		if (event["name"].asString() == "transportEvent") {
 			SDL_Rect eventPosRect;
-			TransportEvent* transportEvent = new TransportEvent();
+			std::unique_ptr<TransportEvent> transportEvent(
+				new TransportEvent());
 
 			eventPosRect.x = event["x"].asInt();
 			eventPosRect.y = event["y"].asInt();
@@ -162,21 +158,22 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 				atoi(event["properties"]["destX"].asCString()),
 				atoi(event["properties"]["destY"].asCString()));
 
-			entities_.push_back(transportEvent);
+			entities_.push_back(std::move(transportEvent));
 		}
 
 		if (event["name"].asString() == "deadlyFloor") {
 			SDL_Rect floorPosRect;
-			DeadlyFloor* deadlyFloor = nullptr;
+			std::unique_ptr<DeadlyFloor> deadlyFloor = nullptr;
 
 			floorPosRect.x = event["x"].asInt();
 			floorPosRect.y = event["y"].asInt();
 			floorPosRect.w = event["width"].asInt();
 			floorPosRect.h = event["height"].asInt();
 
-			deadlyFloor = new DeadlyFloor(graphics, floorPosRect);
+			deadlyFloor = std::unique_ptr<DeadlyFloor>(
+				new DeadlyFloor(graphics, floorPosRect));
 
-			entities_.push_back(deadlyFloor);
+			entities_.push_back(std::move(deadlyFloor));
 		}
 	}
 

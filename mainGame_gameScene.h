@@ -2,6 +2,7 @@
 #define MAIN_GAME_GAME_SCENE_H
 
 #include <vector>
+#include <memory>
 
 #include "map.h"
 #include "sprite.h"
@@ -30,7 +31,7 @@ private:
 	MapTileLayer backLayer_;
 	MapTileLayer foreLayer_;
 
-	std::vector<Entity*> entities_;
+	std::vector<std::unique_ptr<Entity>> entities_;
 
 	Camera camera_;
 	Controller controller_;
