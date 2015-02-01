@@ -35,10 +35,8 @@ Game::execute()
 
 		currentScene.render(graphics_);
 
-		if (timer.getTicks() < (1000.0 / (double) 60)) {
-			SDL_Delay((1000.0 / (double) 60) -
-				  timer.getTicks());
-		}
+		if (timer.getTicks() < (1000.0 / (double) 60))
+			SDL_Delay((1000.0 / (double) 60) - timer.getTicks());
 	}
 
 	return 0;
