@@ -132,6 +132,128 @@ Player::getVelY() const
 }
 
 void
+Player::testCollide(const std::vector<SDL_Rect>& rects)
+{
+	SDL_Rect colliedRect;
+
+	if (velX_ > 0.f) {
+		/* Test right part first */
+		colliedRect.x = std::round(posX_ + kPlayerWidth / 2 + velX_);
+		colliedRect.y = std::round(posY_);
+		colliedRect.w = std::round(kPlayerWidth / 2);
+		colliedRect.h = std::round(kPlayerHeight);
+
+		for (const SDL_Rect& rect : rects) {
+			if (SDL_HasIntersection(&rect, &colliedRect)) {
+				velX_ = 0.f;
+				accX_ = 0.f;
+				posX_ = rect.x - kPlayerWidth;
+			}
+		}
+
+		/* Test left then */
+		colliedRect.x = std::round(posX_ + velX_);
+		colliedRect.y = std::round(posY_);
+		colliedRect.w = std::round(kPlayerWidth / 2);
+		colliedRect.h = std::round(kPlayerHeight);
+
+		for (const SDL_Rect& rect : rects) {
+			if (SDL_HasIntersection(&rect, &colliedRect)) {
+				velX_ = 0.0f;
+				accX_ = 0.0f;
+				posX_ = rect.x + rect.w;
+			}
+		}
+	} else if (velX_ < 0) {
+		/* Test left part first */
+		colliedRect.x = std::round(posX_ + velX_);
+		colliedRect.y = std::round(posY_);
+		colliedRect.w = std::round(kPlayerWidth / 2);
+		colliedRect.h = std::round(kPlayerHeight);
+
+		for (const SDL_Rect& rect : rects) {
+			if (SDL_HasIntersection(&rect, &colliedRect)) {
+				velX_ = 0.0f;
+				accX_ = 0.0f;
+				posX_ = rect.x + rect.w;
+			}
+		}
+
+		/* Test right part then */
+		colliedRect.x = std::round(posX_ + kPlayerWidth / 2 + velX_);
+		colliedRect.y = std::round(posY_);
+		colliedRect.w = std::round(kPlayerWidth / 2);
+		colliedRect.h = std::round(kPlayerHeight);
+
+		for (const SDL_Rect& rect : rects) {
+			if (SDL_HasIntersection(&rect, &colliedRect)) {
+				velX_ = 0.f;
+				accX_ = 0.f;
+				posX_ = rect.x - kPlayerWidth;
+			}
+		}
+	}
+
+	if (velY_ > 0.f) {
+		/* Test botton part first */
+		colliedRect.x = std::round(posX_);
+		colliedRect.y = std::round(posY_ + kPlayerHeight / 2 + velY_);
+		colliedRect.w = std::round(kPlayerWidth);
+		colliedRect.h = std::round(kPlayerHeight / 2);
+
+		for (const SDL_Rect& tile : rects) {
+			if (SDL_HasIntersection(&tile, &colliedRect)) {
+				velY_ = 0.f;
+				accY_ = 0.f;
+				posY_ = tile.y - kPlayerHeight;
+			}
+		}
+
+		/* Test top part then */
+		colliedRect.x = std::round(posX_);
+		colliedRect.y = std::round(posY_ + velY_);
+		colliedRect.w = std::round(kPlayerWidth);
+		colliedRect.h = std::round(kPlayerHeight / 2);
+
+		for (const SDL_Rect& tile : rects) {
+			if (SDL_HasIntersection(&tile, &colliedRect)) {
+				velY_ = 0.f;
+				accY_ = 0.f;
+				posY_ = tile.y + tile.h;
+			}
+		}
+	} else if (velY_ < 0.f) {
+		/* Test top part first */
+		colliedRect.x = std::round(posX_);
+		colliedRect.y = std::round(posY_ + velY_);
+		colliedRect.w = std::round(kPlayerWidth);
+		colliedRect.h = std::round(kPlayerHeight / 2);
+
+		for (const SDL_Rect& tile : rects) {
+			if (SDL_HasIntersection(&tile, &colliedRect)) {
+				velY_ = 0.f;
+				accY_ = 0.f;
+				posY_ = tile.y + tile.h;
+			}
+		}
+
+		/* Test botton part then */
+		colliedRect.x = std::round(posX_);
+		colliedRect.y = std::round(posY_ + kPlayerHeight / 2 + velY_);
+		colliedRect.w = std::round(kPlayerWidth);
+		colliedRect.h = std::round(kPlayerHeight / 2);
+
+		for (const SDL_Rect& tile : rects) {
+			if (SDL_HasIntersection(&tile, &colliedRect)) {
+				velY_ = 0.f;
+				accY_ = 0.f;
+				posY_ = tile.y - kPlayerHeight;
+			}
+		}
+	}
+}
+
+void
 Player::setNextState(enum PlayerState nextState)
 {
 	switch (nextState) {

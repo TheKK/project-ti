@@ -45,6 +45,8 @@ public:
 	int getVelX() const;
 	int getVelY() const;
 
+	void testCollide(const std::vector<SDL_Rect>& rects);
+
 	void setNextState(enum PlayerState nextState);
 
 	void suicide();

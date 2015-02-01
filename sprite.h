@@ -20,6 +20,8 @@ public:
 
 	void update();
 	void render(const Graphics& graphics, SDL_Rect& dstRect);
+
+	void setAlpha(Graphics& graphics, uint8_t value);
 private:
 	std::shared_ptr<SDL_Texture> spriteSheet_;
 	SDL_Rect clipRect_;

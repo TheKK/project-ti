@@ -1,8 +1,10 @@
 #ifndef MAIN_GAME_GAME_SCENE_H
 #define MAIN_GAME_GAME_SCENE_H
 
-#include <vector>
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "map.h"
 #include "sprite.h"
@@ -14,6 +16,9 @@
 #include "sdlSystem.h"
 #include "entity.h"
 
+#include "collideEvent_signalEmitter.h"
+#include "movingGround_signalReciever.h"
+
 #include "gameScene.h"
 
 class Graphics;
@@ -22,7 +27,6 @@ class MainGame_GameScene : public GameScene
 {
 public:
 	MainGame_GameScene(Graphics& graphics);
-	virtual ~MainGame_GameScene() override;
 
 	virtual void eventHandler(Graphics& graphics, const SDL_Event& event) override;
 	virtual void update(Graphics& graphics) override;
@@ -32,6 +36,8 @@ private:
 	MapTileLayer foreLayer_;
 
 	std::vector<std::unique_ptr<Entity>> entities_;
+	std::map<std::string, std::unique_ptr<SignalEmitter>> emitters_;
+	std::vector<std::unique_ptr<SignalReceiver>> recievers_;
 
 	Camera camera_;
 	Controller controller_;
@@ -43,6 +49,7 @@ private:
 
 	void cleanMap_();
 	void loadMap_(Graphics& graphics, const std::string& filePath);
+	void globalUpdate_(Graphics& graphics);
 };
 
 #endif /* MAIN_GAME_GAME_SCENE_H */
