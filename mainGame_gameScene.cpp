@@ -33,7 +33,11 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 {
 	switch (event.type) {
 	case SDL_QUIT:
-		GameSceneManager::shutdown();
+		GameSceneManager::popScene();
+		break;
+	case SDL_KEYDOWN:
+		if (event.key.keysym.scancode == SDL_SCANCODE_W)
+			GameSceneManager::pushScene(graphics, MAIN_GAME_SCENE);
 		break;
 	};
 }
@@ -184,7 +188,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 				std::string msg =
 					"Loading reciever: no emitter named "
 					+ property.asString() + " in this map";
- 
+
 				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 					    msg.c_str());
 
@@ -199,9 +203,9 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 	}
 
 	camera_.setup(graphics,
-		     backLayer_.getMapWidth() * backLayer_.getTileWidth(),
-		     backLayer_.getMapHeight() * backLayer_.getTileHeight(),
-		     kCameraWidth, kCameraHeight);
+		      backLayer_.getMapWidth() * backLayer_.getTileWidth(),
+		      backLayer_.getMapHeight() * backLayer_.getTileHeight(),
+		      kCameraWidth, kCameraHeight);
 	camera_.lookAt(player_);
 }
 

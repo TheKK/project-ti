@@ -22,7 +22,7 @@ Game::Game():
 
 Game::~Game()
 {
-	GameSceneManager::quit();
+	GameSceneManager::shutdown();
 }
 
 int
@@ -32,20 +32,19 @@ Game::execute(enum TotalGameScene firstScene)
 
 	SDL_Event event;
 	Timer timer;
-	GameScene& currentScene = GameSceneManager::currentScene(graphics_);
+	GameScene* currentScene;
 
-	while (GameSceneManager::isRunning()) {
+	while ((currentScene = GameSceneManager::currentScene(graphics_))) {
 		timer.start();
-		currentScene = GameSceneManager::currentScene(graphics_);
 
 		controller_.stateClear();
 		while (SDL_PollEvent(&event)) {
-			currentScene.eventHandler(graphics_, event);
+			currentScene->eventHandler(graphics_, event);
 			controller_.eventHandler(event);
 		}
 
-		currentScene.update(graphics_, controller_);
-		currentScene.render(graphics_);
+		currentScene->update(graphics_, controller_);
+		currentScene->render(graphics_);
 
 		if (timer.getTicks() < (1000.0 / kGameFps))
 			SDL_Delay((1000.0 / kGameFps) - timer.getTicks());

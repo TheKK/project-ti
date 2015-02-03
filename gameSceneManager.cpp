@@ -3,35 +3,44 @@
 #include "gameSceneManager.h"
 
 bool GameSceneManager::isRunning_ = true;
+bool GameSceneManager::needPop_ = false;
 enum TotalGameScene GameSceneManager::sceneToChangeTo_;
-std::stack<GameScene*> GameSceneManager::gameSceneStack_;
-Null_gameScene GameSceneManager::null_gameScene_;
+std::stack<std::unique_ptr<GameScene>> GameSceneManager::gameSceneStack_;
+Null_GameScene GameSceneManager::null_gameScene_;
 
-GameScene&
+GameScene*
 GameSceneManager::currentScene(Graphics& graphics)
 {
+	/* TODO We need more elegant */
 	if (sceneToChangeTo_ != NULL_SCENE) {
 		gameSceneStack_.pop();
 		pushScene(graphics, sceneToChangeTo_);
 		sceneToChangeTo_ = NULL_SCENE;
 	}
 
-	if (gameSceneStack_.size() > 0)
-		return *gameSceneStack_.top();
-	else
-		return null_gameScene_;
+	if (needPop_) {
+		gameSceneStack_.pop();
+		needPop_ = false;
+	}
+
+	if (gameSceneStack_.size() == 0)
+		shutdown();
+
+	if (!isRunning_)
+		return nullptr;
+
+	return gameSceneStack_.top().get();
 }
 
 void
 GameSceneManager::pushScene(Graphics& graphics, enum TotalGameScene which)
 {
-
-	GameScene* newGameScene = nullptr;
-
 	switch (which) {
+	case NULL_SCENE:
+		gameSceneStack_.push(std::unique_ptr<GameScene>(new Null_GameScene()));
+		break;
 	case MAIN_GAME_SCENE:
-		newGameScene = new MainGame_GameScene(graphics);
-		gameSceneStack_.push(newGameScene);
+		gameSceneStack_.push(std::unique_ptr<GameScene>(new MainGame_GameScene(graphics)));
 		break;
 	default:
 		break;
@@ -45,22 +54,16 @@ GameSceneManager::changeScene(Graphics& graphics, enum TotalGameScene toWhich)
 }
 
 void
-GameSceneManager::shutdown()
+GameSceneManager::popScene()
 {
-	isRunning_ = false;
-}
-
-bool
-GameSceneManager::isRunning()
-{
-	return isRunning_;
+	needPop_ = true;
 }
 
 void
-GameSceneManager::quit()
+GameSceneManager::shutdown()
 {
-	while (!gameSceneStack_.empty()) {
-		delete gameSceneStack_.top();
+	isRunning_ = false;
+
+	while (!gameSceneStack_.empty())
 		gameSceneStack_.pop();
-	}
 }
