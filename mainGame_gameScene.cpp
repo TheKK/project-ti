@@ -3,6 +3,7 @@
 #include "transportEvent.h"
 #include "deadlyFloor.h"
 #include "gameSceneManager.h"
+#include "controller.h"
 
 #include "mainGame_gameScene.h"
 
@@ -30,46 +31,32 @@ MainGame_GameScene::MainGame_GameScene(Graphics& graphics):
 void
 MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 {
-	controller_.eventHandler(event);
-
 	switch (event.type) {
 	case SDL_QUIT:
 		GameSceneManager::shutdown();
-		break;
-	case SDL_KEYDOWN:
-		if (event.key.repeat)
-			break;
-		break;
-	case SDL_DROPFILE:
-		cleanMap_();
-		loadMap_(graphics, event.drop.file);
 		break;
 	};
 }
 
 void
-MainGame_GameScene::update(Graphics& graphics)
+MainGame_GameScene::update(Graphics& graphics, const Controller& controller)
 {
-	globalUpdate_(graphics);
+	globalUpdate_(graphics, controller);
 
-	if (bulletTimeCounter_ != 0) {
-		controller_.stateClear();
+	if (bulletTimeCounter_ != 0)
 		return;
-	}
 
-	player_.update(controller_, backLayer_);
+	player_.update(controller, backLayer_);
 	camera_.update();
 
 	for (auto& e : entities_)
 		e->update(player_);
 
 	for (auto& e : emitters_)
-		e.second->update(player_, controller_);
+		e.second->update(player_, controller);
 
 	for (auto& e : recievers_)
-		e->update(player_, controller_);
-
-	controller_.stateClear();
+		e->update(player_, controller);
 }
 
 void
@@ -219,9 +206,10 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 }
 
 void
-MainGame_GameScene::globalUpdate_(Graphics& graphics)
+MainGame_GameScene::globalUpdate_(Graphics& graphics,
+				  const Controller& controller)
 {
-	if (controller_.getButtonState(BUTTON_L2)) {
+	if (controller.getButtonState(BUTTON_L2)) {
 		++bulletTimeCounter_;
 		if (bulletTimeCounter_ < kBulletTimeMax)
 			return;
@@ -231,15 +219,15 @@ MainGame_GameScene::globalUpdate_(Graphics& graphics)
 		bulletTimeCounter_ = 0;
 	}
 
-	if (controller_.ifButtonPressed(BUTTON_START))
+	if (controller.ifButtonPressed(BUTTON_START))
 		GameSceneManager::shutdown();
 
-	if (controller_.ifButtonPressed(BUTTON_SELECT)) {
+	if (controller.ifButtonPressed(BUTTON_SELECT)) {
 		cleanMap_();
 		loadMap_(graphics, kGameMaps[currentMap_]);
 	}
 
-	if (controller_.ifButtonPressed(BUTTON_R)) {
+	if (controller.ifButtonPressed(BUTTON_R)) {
 		++currentMap_;
 		if (currentMap_ == kGameMaps.size())
 			currentMap_ = 0;
@@ -247,7 +235,7 @@ MainGame_GameScene::globalUpdate_(Graphics& graphics)
 		loadMap_(graphics, kGameMaps[currentMap_]);
 	}
 
-	if (controller_.ifButtonPressed(BUTTON_L)) {
+	if (controller.ifButtonPressed(BUTTON_L)) {
 		--currentMap_;
 		if (currentMap_ < 0)
 			currentMap_ = kGameMaps.size() - 1;

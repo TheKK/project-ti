@@ -2,11 +2,12 @@
 #define WINDOW_H
 
 #include <SDL2/SDL.h>
+#include <string>
 
 class Window
 {
 public:
-	Window();
+	Window(const std::string& windowTitle, int w, int h);
 	~Window();
 
 	SDL_Window* getWindow() const;
