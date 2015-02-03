@@ -7,6 +7,10 @@
 
 class Graphics;
 
+/*
+ * TODO Currently this only accept horizontal sprite,
+ * need to be more flexible
+ */
 class AnimatedSprite
 {
 public:

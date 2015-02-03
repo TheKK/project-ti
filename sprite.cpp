@@ -5,18 +5,10 @@
 
 #include "graphics.h"
 
-Sprite::Sprite()
-{
-}
-
 Sprite::Sprite(Graphics& graphics, const std::string& filePath,
 	       const SDL_Rect& clipRect)
 {
 	load(graphics, filePath, clipRect);
-}
-
-Sprite::~Sprite()
-{
 }
 
 void

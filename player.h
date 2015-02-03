@@ -25,9 +25,7 @@ enum PlayerState
 class Player
 {
 public:
-	Player();
 	Player(Graphics& graphics);
-	~Player();
 
 	void update(const Controller& controller,
 		    const MapTileLayer& tileLayer);

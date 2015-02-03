@@ -20,15 +20,6 @@ namespace
 	const float kGravityAcc = 0.11f;
 }
 
-Player::Player():
-	posX_(10), posY_(10),
-	velX_(0), velY_(0),
-	accX_(0), accY_(0)
-{
-	currentState_ = &standingState_;
-	nextState_ = nullptr;
-}
-
 Player::Player(Graphics& graphics):
 	standSprite_(graphics, kSpriteName, {0, 0, 10, 10}),
 	posX_(10), posY_(10),
@@ -37,10 +28,6 @@ Player::Player(Graphics& graphics):
 {
 	currentState_ = &standingState_;
 	nextState_ = nullptr;
-}
-
-Player::~Player()
-{
 }
 
 void

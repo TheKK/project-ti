@@ -10,10 +10,8 @@ class Graphics;
 class Sprite
 {
 public:
-	Sprite();
 	Sprite(Graphics& graphics, const std::string& filePath,
 	       const SDL_Rect& clipRect);
-	~Sprite();
 
 	void load(Graphics& graphics, const std::string& filePath,
 		  const SDL_Rect& clipRect);
