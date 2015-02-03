@@ -63,7 +63,4 @@ void
 GameSceneManager::shutdown()
 {
 	isRunning_ = false;
-
-	while (!gameSceneStack_.empty())
-		gameSceneStack_.pop();
 }
