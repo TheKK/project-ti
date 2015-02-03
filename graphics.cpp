@@ -1,8 +1,8 @@
 #include <string>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdexcept>
-#include <iostream>
 
 #include "window.h"
 
@@ -16,6 +16,7 @@ Graphics::Graphics(const Window& window)
 Graphics::~Graphics()
 {
 	IMG_Quit();
+	TTF_Quit();
 }
 
 void
@@ -33,6 +34,9 @@ Graphics::init(const Window& window)
 
 	if (IMG_Init(IMG_INIT_PNG) < 0)
 		throw std::runtime_error(IMG_GetError());
+
+	if (TTF_Init() < 0)
+		throw std::runtime_error(TTF_GetError());
 }
 
 std::shared_ptr<SDL_Texture>
@@ -41,19 +45,46 @@ Graphics::loadSprite(const std::string& filePath)
 	std::shared_ptr<SDL_Texture> toReturn;
 
 	if (loadedTextures_.count(filePath) == 0) {
+		std::string msg = "create: " + filePath;
+
 		toReturn.reset(
 			loadTextureFromFile_(filePath),
 			[this, filePath](SDL_Texture* t)
 			{
+				std::string msg = "delete: " + filePath;
+
 				SDL_DestroyTexture(t);
 				this->loadedTextures_.erase(filePath);
-				std::cout << "delete: " << filePath << "\n";
+				SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+					    msg.c_str());
 			});
 		loadedTextures_[filePath] = toReturn;
-		std::cout << "create: " << filePath << "\n";
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, msg.c_str());
 	} else {
 		toReturn = loadedTextures_[filePath].lock();
 	}
+
+	return toReturn;
+}
+
+std::shared_ptr<SDL_Texture>
+Graphics::loadText(TTF_Font* font, const std::string& text, SDL_Color& color)
+{
+	std::shared_ptr<SDL_Texture> toReturn;
+	std::string msg = "create textlabel: " + text;
+
+	toReturn.reset(
+		createTextTexture_(font, text, color),
+		[this, text](SDL_Texture* t)
+		{
+			std::string msg = "delete: " + text;
+
+			SDL_DestroyTexture(t);
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
+				    msg.c_str());
+		});
+
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, msg.c_str());
 
 	return toReturn;
 }
@@ -107,7 +138,7 @@ Graphics::loadTextureFromFile_(const std::string& filePath)
 	basePath = nullptr;
 
 	loadedImage = IMG_Load(fullPath.c_str());
-	if (loadedImage == nullptr) {
+	if (!loadedImage) {
 		std::string errMsg;
 
 		errMsg = "IMG error: ";
@@ -117,7 +148,7 @@ Graphics::loadTextureFromFile_(const std::string& filePath)
 	}
 
 	tex = SDL_CreateTextureFromSurface(renderer_, loadedImage);
-	if (tex == nullptr) {
+	if (!tex) {
 		std::string errMsg;
 
 		errMsg = "SDL error: ";
@@ -127,8 +158,40 @@ Graphics::loadTextureFromFile_(const std::string& filePath)
 	}
 
 	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-
 	SDL_FreeSurface(loadedImage);
+
+	return tex;
+}
+
+SDL_Texture*
+Graphics::createTextTexture_(TTF_Font* font, const std::string& text,
+			     SDL_Color& color)
+{
+	SDL_Surface* tmpSurface = nullptr;
+	SDL_Texture* tex = nullptr;
+
+	tmpSurface = TTF_RenderText_Blended(font, text.c_str(), color);
+	if (!tmpSurface) {
+		std::string errMsg;
+
+		errMsg = "TTF error: ";
+		errMsg += TTF_GetError();
+
+		throw std::runtime_error(errMsg);;
+	}
+
+	tex = SDL_CreateTextureFromSurface(renderer_, tmpSurface);
+	if (!tex) {
+		std::string errMsg;
+
+		errMsg = "SDL error: ";
+		errMsg += SDL_GetError();
+
+		throw std::runtime_error(errMsg);;
+	}
+
+	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+	SDL_FreeSurface(tmpSurface);
 
 	return tex;
 }

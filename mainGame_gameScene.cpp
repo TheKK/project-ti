@@ -21,6 +21,9 @@ namespace
 }
 
 MainGame_GameScene::MainGame_GameScene(Graphics& graphics):
+	testLabel_(graphics, "Hello World!",
+		   "assets/fonts/djb_almost_perfect/DJB Almost Perfect.ttf",
+		   60, SDL_Color({0x00, 0x00, 0x00})),
 	player_(graphics),
 	currentMap_(0)
 {
@@ -80,6 +83,9 @@ MainGame_GameScene::render(Graphics& graphics)
 
 	for (auto& e : recievers_)
 		e->render(graphics, camera_);
+
+	SDL_Rect re = {0, 0, 150, 150};
+	testLabel_.render(graphics, re);
 
 	graphics.present();
 }
@@ -156,7 +162,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 	objectLayer.load(mapLoader, "emitters");
 	for (Json::Value& emitter : objectLayer) {
 		std::unique_ptr<CollideEvent_signalEmitter> collideEvent;
-		const std::string name = emitter["name"].asString();	
+		const std::string name = emitter["name"].asString();
 		SDL_Rect posRect;
 
 		posRect.x = emitter["x"].asInt();

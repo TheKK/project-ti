@@ -13,6 +13,7 @@
 #include "graphics.h"
 #include "window.h"
 #include "sdlSystem.h"
+#include "textLabel.h"
 #include "entity.h"
 
 #include "collideEvent_signalEmitter.h"
@@ -39,6 +40,8 @@ private:
 		PAUSING
 	};
 	enum PlayingState playingState_ = RUNNING;
+
+	TextLabel testLabel_;
 
 	MapTileLayer backLayer_;
 	MapTileLayer foreLayer_;

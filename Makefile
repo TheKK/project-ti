@@ -6,7 +6,7 @@ DEP = $(SRC:.cpp=.d)
 OUT_EXE = map
 
 $(OUT_EXE): $(OBJ)
-	$(CXX) $^ -std=c++14 -g -lSDL2 -lSDL2_image -ljsoncpp -o $@
+	$(CXX) $^ -std=c++14 -g -lSDL2 -lSDL2_image -lSDL2_ttf -ljsoncpp -o $@
 
 %.o: %.cpp
 	$(CXX) $^ -std=c++14 -g -c -o $@
