@@ -33,7 +33,7 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 {
 	switch (event.type) {
 	case SDL_QUIT:
-		GameSceneManager::popScene();
+		GameSceneManager::shutdown();
 		break;
 	case SDL_KEYDOWN:
 		if (event.key.keysym.scancode == SDL_SCANCODE_W)

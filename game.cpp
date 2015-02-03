@@ -22,7 +22,7 @@ Game::Game():
 
 Game::~Game()
 {
-	GameSceneManager::shutdown();
+	GameSceneManager::quit();
 }
 
 int

@@ -64,3 +64,10 @@ GameSceneManager::shutdown()
 {
 	isRunning_ = false;
 }
+
+void
+GameSceneManager::quit()
+{
+	while (!gameSceneStack_.empty())
+		gameSceneStack_.pop();
+}
