@@ -84,8 +84,7 @@ MainGame_GameScene::render(Graphics& graphics)
 	for (auto& e : recievers_)
 		e->render(graphics, camera_);
 
-	SDL_Rect re = {0, 0, 150, 150};
-	testLabel_.render(graphics, re);
+	testLabel_.render(graphics, nullptr);
 
 	graphics.present();
 }

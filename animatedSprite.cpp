@@ -51,7 +51,7 @@ AnimatedSprite::update()
 }
 
 void
-AnimatedSprite::render(const Graphics& graphics, SDL_Rect& dstRect)
+AnimatedSprite::render(const Graphics& graphics, const SDL_Rect* dstRect)
 {
-	graphics.render(spriteSheet_.get(), drawClipRect_, dstRect);
+	graphics.render(spriteSheet_.get(), &drawClipRect_, dstRect);
 }

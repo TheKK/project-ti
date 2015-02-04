@@ -7,10 +7,6 @@ TextLabel::TextLabel(Graphics& graphics, const std::string& text,
 		     const std::string& fontPath, int fontSize, SDL_Color color)
 {
 	load(graphics, text, fontPath, fontSize, color);
-	clipRect_.x = 0;
-	clipRect_.y = 0;
-	clipRect_.w = 600;
-	clipRect_.h = 600;
 }
 
 void
@@ -38,7 +34,7 @@ TextLabel::update()
 }
 
 void
-TextLabel::render(const Graphics& graphics, SDL_Rect& dstRect)
+TextLabel::render(const Graphics& graphics, const SDL_Rect* dstRect)
 {
-	graphics.render(spriteSheet_.get(), clipRect_, dstRect);
+	graphics.render(spriteSheet_.get(), nullptr, dstRect);
 }

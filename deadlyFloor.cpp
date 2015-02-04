@@ -39,7 +39,7 @@ DeadlyFloor::render(const Graphics& graphics, const Camera& camera)
 	posToDraw.x -= camera.getLeft();
 	posToDraw.y -= camera.getTop();
 
-	floorSprite_.render(graphics, posToDraw);
+	floorSprite_.render(graphics, &posToDraw);
 }
 
 void

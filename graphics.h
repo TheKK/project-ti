@@ -17,7 +17,7 @@ public:
 
 	void init(const Window& window);
 	void render(SDL_Texture* source,
-		    SDL_Rect& clipRect, SDL_Rect& dstRect) const;
+		    const SDL_Rect* clipRect, const SDL_Rect* dstRect) const;
 
 	void drawRect(SDL_Rect& dstRect) const;
 

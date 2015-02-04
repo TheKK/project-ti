@@ -247,7 +247,7 @@ MapTileLayer::render(Graphics& graphics, const Camera& camera)
 				tileDst.h = tileHeight_;
 
 				tileSprites_[imageName][tileId - firstTileId]
-					.render(graphics, tileDst);
+					.render(graphics, &tileDst);
 
 				break;
 			}

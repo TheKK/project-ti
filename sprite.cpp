@@ -28,7 +28,7 @@ Sprite::update()
 }
 
 void
-Sprite::render(const Graphics& graphics, SDL_Rect& dstRect)
+Sprite::render(const Graphics& graphics, const SDL_Rect* dstRect)
 {
-	graphics.render(spriteSheet_.get(), clipRect_, dstRect);
+	graphics.render(spriteSheet_.get(), &clipRect_, dstRect);
 }

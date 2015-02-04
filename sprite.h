@@ -17,7 +17,7 @@ public:
 		  const SDL_Rect& clipRect);
 
 	void update();
-	void render(const Graphics& graphics, SDL_Rect& dstRect);
+	void render(const Graphics& graphics, const SDL_Rect* dstRect);
 
 	void setAlpha(Graphics& graphics, uint8_t value);
 private:

@@ -17,10 +17,9 @@ public:
 		  const std::string& fontPath, int fontSize, SDL_Color color);
 
 	void update();
-	void render(const Graphics& graphics, SDL_Rect& dstRect);
+	void render(const Graphics& graphics, const SDL_Rect* dstRect);
 private:
 	std::shared_ptr<SDL_Texture> spriteSheet_;
-	SDL_Rect clipRect_ = {0};
 };
 
 #endif /* TEXT_LABEL_H */

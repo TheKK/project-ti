@@ -43,7 +43,7 @@ public:
 		posToDraw.x -= camera.getLeft();
 		posToDraw.y -= camera.getTop();
 
-		groundSprite_.render(graphics, posToDraw);
+		groundSprite_.render(graphics, &posToDraw);
 	}
 
 	virtual void sendSignal() override

@@ -90,10 +90,10 @@ Graphics::loadText(TTF_Font* font, const std::string& text, SDL_Color& color)
 }
 
 void
-Graphics::render(SDL_Texture* source,SDL_Rect& clipRect,
-		 SDL_Rect& dstRect) const
+Graphics::render(SDL_Texture* source,const SDL_Rect* clipRect,
+		 const SDL_Rect* dstRect) const
 {
-	SDL_RenderCopy(renderer_, source, &clipRect, &dstRect);
+	SDL_RenderCopy(renderer_, source, clipRect, dstRect);
 }
 
 void

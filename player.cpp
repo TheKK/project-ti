@@ -60,7 +60,7 @@ Player::render(const Graphics& graphics, const Camera& camera)
 	posToDraw.x = round(posX_) - camera.getLeft();
 	posToDraw.y = round(posY_) - camera.getTop();
 
-	standSprite_.render(graphics, posToDraw);
+	standSprite_.render(graphics, &posToDraw);
 }
 
 void
