@@ -79,6 +79,20 @@ Camera::update()
 	viewRect_.y = std::min(viewRect_.y, worldRect_.h - viewRect_.h);
 }
 
+void
+Camera::setX(int x)
+{
+	target_ = nullptr;
+	viewRect_.x = x;
+}
+
+void
+Camera::setY(int y)
+{
+	target_ = nullptr;
+	viewRect_.y = y;
+}
+
 int
 Camera::getLeft() const
 {
@@ -104,8 +118,8 @@ Camera::getBottom() const
 }
 
 void
-Camera::lookAt(const Player& target)
+Camera::lookAt(const Player* target)
 {
-	target_ = &target;
+	target_ = target;
 }
 

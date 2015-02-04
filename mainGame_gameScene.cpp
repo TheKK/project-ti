@@ -4,6 +4,9 @@
 #include "deadlyFloor.h"
 #include "gameSceneManager.h"
 #include "controller.h"
+#include "moveCamera_eventScript.h"
+#include "wait_eventScript.h"
+#include "cameraLookAt_eventScript.h"
 
 #include "mainGame_gameScene.h"
 
@@ -41,6 +44,19 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 	case SDL_KEYDOWN:
 		if (event.key.keysym.scancode == SDL_SCANCODE_W)
 			GameSceneManager::pushScene(graphics, MAIN_GAME_SCENE);
+
+		if (event.key.keysym.scancode == SDL_SCANCODE_U) {
+			SDL_Point p;
+
+			for (int i = 0; i < 5; ++i) {
+				p = {rand() % 600, rand() % 600};
+				eventScriptQueue_.push(std::unique_ptr<EventScript>(new MoveCamera_eventScript(*this, camera_, &p)));
+				eventScriptQueue_.push(std::unique_ptr<EventScript>(new Wait_eventScript(*this, 60)));
+			}
+
+			eventScriptQueue_.push(std::unique_ptr<EventScript>(new CameraLookAt_eventScript(*this, camera_, &player_)));
+		}
+
 		break;
 	};
 }
@@ -48,22 +64,28 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 void
 MainGame_GameScene::update(Graphics& graphics, const Controller& controller)
 {
-	globalUpdate_(graphics, controller);
+	if (!eventScriptQueue_.empty()) {
+		EventScript& eventScript = *(eventScriptQueue_.front());
 
-	if (bulletTimeCounter_ != 0)
-		return;
+		eventScript.update();
+	} else {
+		globalUpdate_(graphics, controller);
 
-	player_.update(controller, backLayer_);
-	camera_.update();
+		if (bulletTimeCounter_ != 0)
+			return;
 
-	for (auto& e : entities_)
-		e->update(player_);
+		player_.update(controller, backLayer_);
+		camera_.update();
 
-	for (auto& e : emitters_)
-		e.second->update(player_, controller);
+		for (auto& e : entities_)
+			e->update(player_);
 
-	for (auto& e : recievers_)
-		e->update(player_, controller);
+		for (auto& e : emitters_)
+			e.second->update(player_, controller);
+
+		for (auto& e : recievers_)
+			e->update(player_, controller);
+	}
 }
 
 void
@@ -87,6 +109,12 @@ MainGame_GameScene::render(Graphics& graphics)
 	testLabel_.render(graphics, nullptr);
 
 	graphics.present();
+}
+
+void
+MainGame_GameScene::popEventScript()
+{
+	eventScriptQueue_.pop();
 }
 
 void
@@ -211,7 +239,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 		      backLayer_.getMapWidth() * backLayer_.getTileWidth(),
 		      backLayer_.getMapHeight() * backLayer_.getTileHeight(),
 		      kCameraWidth, kCameraHeight);
-	camera_.lookAt(player_);
+	camera_.lookAt(&player_);
 }
 
 void

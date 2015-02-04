@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <queue>
 
 #include "map.h"
 #include "sprite.h"
@@ -15,6 +16,7 @@
 #include "sdlSystem.h"
 #include "textLabel.h"
 #include "entity.h"
+#include "eventScript.h"
 
 #include "collideEvent_signalEmitter.h"
 #include "movingGround_signalReciever.h"
@@ -33,6 +35,8 @@ public:
 	virtual void update(Graphics& graphics,
 			    const Controller& controller) override;
 	virtual void render(Graphics& graphics) override;
+
+	void popEventScript();
 private:
 	enum PlayingState
 	{
@@ -56,6 +60,8 @@ private:
 	int currentMap_;
 
 	int bulletTimeCounter_;
+
+	std::queue<std::unique_ptr<EventScript>> eventScriptQueue_;
 
 	void cleanMap_();
 	void loadMap_(Graphics& graphics, const std::string& filePath);

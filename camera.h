@@ -18,12 +18,15 @@ public:
 
 	void update();
 
+	void setX(int x);
+	void setY(int y);
+
 	int getLeft() const;
 	int getRight() const;
 	int getTop() const;
 	int getBottom() const;
 
-	void lookAt(const Player& target);
+	void lookAt(const Player* target);
 private:
 	SDL_Rect worldRect_ = {0};
 	SDL_Rect viewRect_ = {0};
