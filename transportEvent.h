@@ -12,19 +12,17 @@ class Camera;
 class TransportEvent : public Entity
 {
 public:
-	TransportEvent();
-	~TransportEvent() override;
+	TransportEvent(const SDL_Rect& posRect, Player& player,
+		       const SDL_Point& dstPoint);
 
-	virtual void update(Player& player) override;
+	virtual void update() override;
 	virtual void render(const Graphics& graphics,
 			    const Camera& camera) override;
-
-	void setEventPosRect(const SDL_Rect& posRect);
-	void setTransportDestination(int x, int y);
 private:
-	SDL_Rect posRect_ = {0};
+	SDL_Rect posRect_;
+	SDL_Point dstPoint_;
 
-	int destX_, destY_;
+	Player& player_;
 };
 
 #endif /* TRANSPOTR_EVENT_H */

@@ -4,40 +4,26 @@
 
 #include "transportEvent.h"
 
-TransportEvent::TransportEvent()
-{
-}
-
-TransportEvent::~TransportEvent()
+TransportEvent::TransportEvent(const SDL_Rect& posRect, Player& player,
+			       const SDL_Point& dstPoint)
+	: posRect_(posRect),
+	  dstPoint_(dstPoint),
+	  player_(player)
 {
 }
 
 void
-TransportEvent::update(Player& player)
+TransportEvent::update()
 {
-	SDL_Rect playerPosRect;
+	const SDL_Rect& playerPosRect = player_.posRectOnMap();
 
-	playerPosRect = player.posRectOnMap();
 	if (SDL_HasIntersection(&playerPosRect, &posRect_)) {
-		player.setX(destX_);
-		player.setY(destY_);
+		player_.setX(dstPoint_.x);
+		player_.setY(dstPoint_.y);
 	}
 }
 
 void
 TransportEvent::render(const Graphics& graphics, const Camera& camera)
 {
-}
-
-void
-TransportEvent::setEventPosRect(const SDL_Rect& posRect)
-{
-	posRect_ = posRect;
-}
-
-void
-TransportEvent::setTransportDestination(int x, int y)
-{
-	destX_ = x;
-	destY_ = y;
 }

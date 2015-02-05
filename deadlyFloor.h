@@ -15,21 +15,24 @@ enum Direction
 	RIGHT
 };
 
+class Player;
+
 class DeadlyFloor : public Entity
 {
 public:
-	DeadlyFloor(Graphics& graphics, const SDL_Rect& posRect);
-	virtual ~DeadlyFloor() override;
+	DeadlyFloor(Graphics& graphics, const SDL_Rect& posRect,
+		    Player& player);
 
-	virtual void update(Player& player) override;
+	virtual void update() override;
 	virtual void render(const Graphics& graphics,
 			    const Camera& camera) override;
 
 	void setDirection(enum Direction dir);
 private:
 	SDL_Rect posRect_ = {0};
-
 	Sprite floorSprite_;
+
+	Player& player_;
 };
 
 #endif /* DEADLY_FLOOR_H */

@@ -78,7 +78,7 @@ MainGame_GameScene::update(Graphics& graphics, const Controller& controller)
 		camera_.update();
 
 		for (auto& e : entities_)
-			e->update(player_);
+			e->update();
 
 		for (auto& e : emitters_)
 			e.second->update(player_, controller);
@@ -155,40 +155,44 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 
 		} else if (eventName == "transportEvent") {
 			SDL_Rect eventPosRect;
-			std::unique_ptr<TransportEvent> transportEvent(
-				new TransportEvent());
+			SDL_Point dstPoint;
+			const Json::Value& properties = event["properties"];
+			std::unique_ptr<TransportEvent> transportEvent;
 
 			eventPosRect.x = event["x"].asInt();
 			eventPosRect.y = event["y"].asInt();
 			eventPosRect.w = event["width"].asInt();
 			eventPosRect.h = event["height"].asInt();
 
-			transportEvent->setEventPosRect(eventPosRect);
-			transportEvent->setTransportDestination(
-				atoi(event["properties"]["destX"].asCString()),
-				atoi(event["properties"]["destY"].asCString()));
+			dstPoint.x = atoi(properties["destX"].asCString());
+			dstPoint.y = atoi(properties["destY"].asCString());
+
+			transportEvent.reset(new TransportEvent(eventPosRect,
+								player_,
+								dstPoint));
 
 			entities_.push_back(std::move(transportEvent));
 
 		} else if (eventName == "deadlyFloor") {
-			SDL_Rect floorPosRect;
+			SDL_Rect eventPosRect;
 			std::unique_ptr<DeadlyFloor> deadlyFloor;
 
-			floorPosRect.x = event["x"].asInt();
-			floorPosRect.y = event["y"].asInt();
-			floorPosRect.w = event["width"].asInt();
-			floorPosRect.h = event["height"].asInt();
+			eventPosRect.x = event["x"].asInt();
+			eventPosRect.y = event["y"].asInt();
+			eventPosRect.w = event["width"].asInt();
+			eventPosRect.h = event["height"].asInt();
 
-			deadlyFloor = std::unique_ptr<DeadlyFloor>(
-				new DeadlyFloor(graphics, floorPosRect));
+			deadlyFloor.reset(new DeadlyFloor(graphics,
+							  eventPosRect,
+							  player_));
 
 			entities_.push_back(std::move(deadlyFloor));
+
 		} else {
 			std::string warnMsg;
 
 			warnMsg = "[loadMap] event " + eventName;
 			warnMsg += " didn't have implemtation";
-
 			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 				    warnMsg.c_str());
 		}

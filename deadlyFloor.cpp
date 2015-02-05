@@ -12,23 +12,21 @@ namespace
 	const SDL_Rect kSpriteClipRect = {0, 0, kFloorWidth, kFloorHeight};
 }
 
-DeadlyFloor::DeadlyFloor(Graphics& graphics, const SDL_Rect& posRect):
-	posRect_(posRect),
-	floorSprite_(graphics, kSpriteName, kSpriteClipRect)
-{
-}
-
-DeadlyFloor::~DeadlyFloor()
+DeadlyFloor::DeadlyFloor(Graphics& graphics, const SDL_Rect& posRect,
+			 Player& player)
+	: posRect_(posRect),
+	  floorSprite_(graphics, kSpriteName, kSpriteClipRect),
+	  player_(player)
 {
 }
 
 void
-DeadlyFloor::update(Player& player)
+DeadlyFloor::update()
 {
-	SDL_Rect playerRect = player.posRectOnMap();
+	const SDL_Rect& playerRect = player_.posRectOnMap();
 
 	if (SDL_HasIntersection(&posRect_, &playerRect))
-		player.suicide();
+		player_.suicide();
 }
 
 void
