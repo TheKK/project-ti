@@ -137,7 +137,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 	MapObjectLayer objectLayer;
 
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,
-		    "Reload map file: %s", mapFile.c_str());
+		    "Load map file: %s", mapFile.c_str());
 
 	mapLoader.load(mapFile);
 	backLayer_.load(graphics, mapLoader, "layer_one");
@@ -145,14 +145,15 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 
 	objectLayer.load(mapLoader, "events");
 	for (Json::Value& event : objectLayer) {
-		if (event["name"].asString() == "startPoint") {
+		const std::string& eventName = event["name"].asString();
+
+		if (eventName == "startPoint") {
 			player_.setX(event["x"].asInt());
 			player_.setY(event["y"].asInt());
 			player_.setCheckpoint(event["x"].asInt(),
 					      event["y"].asInt());
-		}
 
-		if (event["name"].asString() == "transportEvent") {
+		} else if (eventName == "transportEvent") {
 			SDL_Rect eventPosRect;
 			std::unique_ptr<TransportEvent> transportEvent(
 				new TransportEvent());
@@ -168,9 +169,8 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 				atoi(event["properties"]["destY"].asCString()));
 
 			entities_.push_back(std::move(transportEvent));
-		}
 
-		if (event["name"].asString() == "deadlyFloor") {
+		} else if (eventName == "deadlyFloor") {
 			SDL_Rect floorPosRect;
 			std::unique_ptr<DeadlyFloor> deadlyFloor;
 
@@ -183,9 +183,18 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 				new DeadlyFloor(graphics, floorPosRect));
 
 			entities_.push_back(std::move(deadlyFloor));
+		} else {
+			std::string warnMsg;
+
+			warnMsg = "[loadMap] event " + eventName;
+			warnMsg += " didn't have implemtation";
+
+			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+				    warnMsg.c_str());
 		}
 	}
 
+	/* TODO fix naming problem */
 	objectLayer.load(mapLoader, "emitters");
 	for (Json::Value& emitter : objectLayer) {
 		std::unique_ptr<CollideEvent_signalEmitter> collideEvent;
@@ -203,6 +212,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 		emitters_[name] = std::move(collideEvent);
 	}
 
+	/* TODO fix naming problem */
 	objectLayer.load(mapLoader, "recievers");
 	for (Json::Value& reciever : objectLayer) {
 		std::unique_ptr<MovingGraound_signalReciever> movingGround;
