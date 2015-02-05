@@ -23,19 +23,20 @@ namespace
 	const int kBulletTimeMax = 2;
 }
 
-MainGame_GameScene::MainGame_GameScene(Graphics& graphics):
-	testLabel_(graphics, "Hello World!",
+MainGame_GameScene::MainGame_GameScene(Graphics& graphics)
+	: graphics_(graphics),
+	  testLabel_(graphics, "Hello World!",
 		   "assets/fonts/djb_almost_perfect/DJB Almost Perfect.ttf",
 		   60, SDL_Color({0x00, 0x00, 0x00})),
-	player_(graphics),
-	currentMap_(0)
+	  player_(graphics),
+	  currentMap_(0)
 {
 	cleanMap_();
-	loadMap_(graphics, kGameMaps[currentMap_]);
+	loadMap_(kGameMaps[currentMap_]);
 }
 
 void
-MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
+MainGame_GameScene::eventHandler(const SDL_Event& event)
 {
 	switch (event.type) {
 	case SDL_QUIT:
@@ -43,7 +44,7 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 		break;
 	case SDL_KEYDOWN:
 		if (event.key.keysym.scancode == SDL_SCANCODE_W)
-			GameSceneManager::pushScene(graphics, MAIN_GAME_SCENE);
+			GameSceneManager::pushScene(graphics_, MAIN_GAME_SCENE);
 
 		if (event.key.keysym.scancode == SDL_SCANCODE_U) {
 			SDL_Point p;
@@ -62,14 +63,14 @@ MainGame_GameScene::eventHandler(Graphics& graphics, const SDL_Event& event)
 }
 
 void
-MainGame_GameScene::update(Graphics& graphics, const Controller& controller)
+MainGame_GameScene::update(const Controller& controller)
 {
 	if (!eventScriptQueue_.empty()) {
 		EventScript& eventScript = *(eventScriptQueue_.front());
 
 		eventScript.update();
 	} else {
-		globalUpdate_(graphics, controller);
+		globalUpdate_(controller);
 
 		if (bulletTimeCounter_ != 0)
 			return;
@@ -89,26 +90,33 @@ MainGame_GameScene::update(Graphics& graphics, const Controller& controller)
 }
 
 void
-MainGame_GameScene::render(Graphics& graphics)
+MainGame_GameScene::render()
 {
-	graphics.clear();
+	graphics_.clear();
 
-	backLayer_.render(graphics, camera_);
-	player_.render(graphics, camera_);
-	foreLayer_.render(graphics, camera_);
+	backLayer_.render(graphics_, camera_);
+	player_.render(graphics_, camera_);
+	foreLayer_.render(graphics_, camera_);
 
 	for (auto& e : entities_)
-		e->render(graphics, camera_);
+		e->render(graphics_, camera_);
 
 	for (auto& e : emitters_)
-		e.second->render(graphics, camera_);
+		e.second->render(graphics_, camera_);
 
 	for (auto& e : recievers_)
-		e->render(graphics, camera_);
+		e->render(graphics_, camera_);
 
-	testLabel_.render(graphics, nullptr);
+	testLabel_.render(graphics_, nullptr);
 
-	graphics.present();
+	graphics_.present();
+}
+
+void
+MainGame_GameScene::changeMap(const std::string& mapFile)
+{
+	cleanMap_();
+	loadMap_(mapFile);
 }
 
 void
@@ -131,7 +139,7 @@ MainGame_GameScene::cleanMap_()
 }
 
 void
-MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
+MainGame_GameScene::loadMap_(const std::string& mapFile)
 {
 	MapLoader mapLoader;
 	MapObjectLayer objectLayer;
@@ -140,8 +148,8 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 		    "Load map file: %s", mapFile.c_str());
 
 	mapLoader.load(mapFile);
-	backLayer_.load(graphics, mapLoader, "layer_one");
-	foreLayer_.load(graphics, mapLoader, "layer_two");
+	backLayer_.load(graphics_, mapLoader, "layer_one");
+	foreLayer_.load(graphics_, mapLoader, "layer_two");
 
 	objectLayer.load(mapLoader, "events");
 	for (Json::Value& event : objectLayer) {
@@ -182,7 +190,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 			eventPosRect.w = event["width"].asInt();
 			eventPosRect.h = event["height"].asInt();
 
-			deadlyFloor.reset(new DeadlyFloor(graphics,
+			deadlyFloor.reset(new DeadlyFloor(graphics_,
 							  eventPosRect,
 							  player_));
 
@@ -228,7 +236,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 		posRect.h = reciever["height"].asInt();
 
 		movingGround = std::unique_ptr<MovingGraound_signalReciever>(
-			new MovingGraound_signalReciever(graphics, posRect));
+			new MovingGraound_signalReciever(graphics_, posRect));
 
 		for (auto& property : reciever["properties"]) {
 			if (emitters_.count(property.asString()) == 0) {
@@ -249,7 +257,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 		recievers_.push_back(std::move(movingGround));
 	}
 
-	camera_.setup(graphics,
+	camera_.setup(graphics_,
 		      backLayer_.getMapWidth() * backLayer_.getTileWidth(),
 		      backLayer_.getMapHeight() * backLayer_.getTileHeight(),
 		      kCameraWidth, kCameraHeight);
@@ -257,8 +265,7 @@ MainGame_GameScene::loadMap_(Graphics& graphics, const std::string& mapFile)
 }
 
 void
-MainGame_GameScene::globalUpdate_(Graphics& graphics,
-				  const Controller& controller)
+MainGame_GameScene::globalUpdate_(const Controller& controller)
 {
 	if (controller.getButtonState(BUTTON_L2)) {
 		++bulletTimeCounter_;
@@ -275,7 +282,7 @@ MainGame_GameScene::globalUpdate_(Graphics& graphics,
 
 	if (controller.ifButtonPressed(BUTTON_SELECT)) {
 		cleanMap_();
-		loadMap_(graphics, kGameMaps[currentMap_]);
+		loadMap_(kGameMaps[currentMap_]);
 	}
 
 	if (controller.ifButtonPressed(BUTTON_R)) {
@@ -283,7 +290,7 @@ MainGame_GameScene::globalUpdate_(Graphics& graphics,
 		if (currentMap_ == kGameMaps.size())
 			currentMap_ = 0;
 		cleanMap_();
-		loadMap_(graphics, kGameMaps[currentMap_]);
+		loadMap_(kGameMaps[currentMap_]);
 	}
 
 	if (controller.ifButtonPressed(BUTTON_L)) {
@@ -291,6 +298,6 @@ MainGame_GameScene::globalUpdate_(Graphics& graphics,
 		if (currentMap_ < 0)
 			currentMap_ = kGameMaps.size() - 1;
 		cleanMap_();
-		loadMap_(graphics, kGameMaps[currentMap_]);
+		loadMap_(kGameMaps[currentMap_]);
 	}
 }

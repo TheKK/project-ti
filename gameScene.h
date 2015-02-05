@@ -11,12 +11,9 @@ class GameScene
 public:
 	virtual ~GameScene() {};
 
-	/* TODO Fix "Graphics" hell */
-	virtual void eventHandler(Graphics& graphics,
-				  const SDL_Event& event) = 0;
-	virtual void update(Graphics& graphics,
-			    const Controller& controller) = 0;
-	virtual void render(Graphics& graphics) = 0;
+	virtual void eventHandler(const SDL_Event& event) = 0;
+	virtual void update(const Controller& controller) = 0;
+	virtual void render() = 0;
 };
 
 #endif /* GAME_SCENE_H */

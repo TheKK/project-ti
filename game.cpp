@@ -39,12 +39,12 @@ Game::execute(enum TotalGameScene firstScene)
 
 		controller_.stateClear();
 		while (SDL_PollEvent(&event)) {
-			currentScene->eventHandler(graphics_, event);
+			currentScene->eventHandler(event);
 			controller_.eventHandler(event);
 		}
 
-		currentScene->update(graphics_, controller_);
-		currentScene->render(graphics_);
+		currentScene->update(controller_);
+		currentScene->render();
 
 		if (timer.getTicks() < (1000.0 / kGameFps))
 			SDL_Delay((1000.0 / kGameFps) - timer.getTicks());

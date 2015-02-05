@@ -12,11 +12,9 @@ class Controller;
 class Null_GameScene : public GameScene
 {
 public:
-	virtual void eventHandler(Graphics& graphics,
-				  const SDL_Event& event) override {};
-	virtual void update(Graphics& graphics,
-			    const Controller& controller) override {};
-	virtual void render(Graphics& graphics) override {};
+	virtual void eventHandler(const SDL_Event& event) override {};
+	virtual void update(const Controller& controller) override {};
+	virtual void render() override {};
 };
 
 enum TotalGameScene

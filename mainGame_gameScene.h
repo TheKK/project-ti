@@ -30,12 +30,11 @@ class MainGame_GameScene : public GameScene
 public:
 	MainGame_GameScene(Graphics& graphics);
 
-	virtual void eventHandler(Graphics& graphics,
-				  const SDL_Event& event) override;
-	virtual void update(Graphics& graphics,
-			    const Controller& controller) override;
-	virtual void render(Graphics& graphics) override;
+	virtual void eventHandler(const SDL_Event& event) override;
+	virtual void update(const Controller& controller) override;
+	virtual void render() override;
 
+	void changeMap(const std::string& mapFile);
 	void popEventScript();
 private:
 	enum PlayingState
@@ -44,6 +43,8 @@ private:
 		PAUSING
 	};
 	enum PlayingState playingState_ = RUNNING;
+
+	Graphics& graphics_;
 
 	TextLabel testLabel_;
 
@@ -64,8 +65,8 @@ private:
 	std::queue<std::unique_ptr<EventScript>> eventScriptQueue_;
 
 	void cleanMap_();
-	void loadMap_(Graphics& graphics, const std::string& filePath);
-	void globalUpdate_(Graphics& graphics, const Controller& controller);
+	void loadMap_(const std::string& filePath);
+	void globalUpdate_(const Controller& controller);
 };
 
 #endif /* MAIN_GAME_GAME_SCENE_H */
