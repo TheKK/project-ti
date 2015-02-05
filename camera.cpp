@@ -121,5 +121,7 @@ void
 Camera::lookAt(const Player* target)
 {
 	target_ = target;
+
+	update();
 }
 

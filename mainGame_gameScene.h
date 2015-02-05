@@ -46,8 +46,6 @@ private:
 
 	Graphics& graphics_;
 
-	TextLabel testLabel_;
-
 	MapTileLayer backLayer_;
 	MapTileLayer foreLayer_;
 

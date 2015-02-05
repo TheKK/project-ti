@@ -26,14 +26,10 @@ namespace
 
 MainGame_GameScene::MainGame_GameScene(Graphics& graphics)
 	: graphics_(graphics),
-	  testLabel_(graphics, "Hello World!",
-		   "assets/fonts/djb_almost_perfect/DJB Almost Perfect.ttf",
-		   60, SDL_Color({0x00, 0x00, 0x00})),
 	  player_(graphics),
 	  currentMap_(0)
 {
-	cleanMap_();
-	loadMap_(kGameMaps[currentMap_]);
+	changeMap(kGameMaps[currentMap_]);
 }
 
 void
@@ -107,8 +103,6 @@ MainGame_GameScene::render()
 
 	for (auto& e : recievers_)
 		e->render(graphics_, camera_);
-
-	testLabel_.render(graphics_, nullptr);
 
 	graphics_.present();
 }
