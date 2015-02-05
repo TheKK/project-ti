@@ -28,8 +28,11 @@ MapLoader::load(const std::string& filePath)
 	std::fstream fd;
 
 	fd.open(filePath, std::fstream::in);
-	if (!fd.is_open())
-		throw std::runtime_error("file oepn error");
+	if (!fd.is_open()) {
+		std::string errMsg = "[MapLoader] file not found: " + filePath;
+
+		throw std::runtime_error(errMsg);
+	}
 
 	if (reader.parse(fd, mapData_) == false) {
 		fd.close();

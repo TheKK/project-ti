@@ -1,12 +1,13 @@
 #include <stdexcept>
 
-#include "transportEvent.h"
+#include "cameraLookAt_eventScript.h"
+#include "controller.h"
 #include "deadlyFloor.h"
 #include "gameSceneManager.h"
-#include "controller.h"
+#include "mapChangeEvent.h"
 #include "moveCamera_eventScript.h"
+#include "transportEvent.h"
 #include "wait_eventScript.h"
-#include "cameraLookAt_eventScript.h"
 
 #include "mainGame_gameScene.h"
 
@@ -113,7 +114,7 @@ MainGame_GameScene::render()
 }
 
 void
-MainGame_GameScene::changeMap(const std::string& mapFile)
+MainGame_GameScene::changeMap(const std::string mapFile)
 {
 	cleanMap_();
 	loadMap_(mapFile);
@@ -154,6 +155,12 @@ MainGame_GameScene::loadMap_(const std::string& mapFile)
 	objectLayer.load(mapLoader, "events");
 	for (Json::Value& event : objectLayer) {
 		const std::string& eventName = event["name"].asString();
+		SDL_Rect eventPosRect;
+
+		eventPosRect.x = event["x"].asInt();
+		eventPosRect.y = event["y"].asInt();
+		eventPosRect.w = event["width"].asInt();
+		eventPosRect.h = event["height"].asInt();
 
 		if (eventName == "startPoint") {
 			player_.setX(event["x"].asInt());
@@ -162,15 +169,9 @@ MainGame_GameScene::loadMap_(const std::string& mapFile)
 					      event["y"].asInt());
 
 		} else if (eventName == "transportEvent") {
-			SDL_Rect eventPosRect;
 			SDL_Point dstPoint;
 			const Json::Value& properties = event["properties"];
 			std::unique_ptr<TransportEvent> transportEvent;
-
-			eventPosRect.x = event["x"].asInt();
-			eventPosRect.y = event["y"].asInt();
-			eventPosRect.w = event["width"].asInt();
-			eventPosRect.h = event["height"].asInt();
 
 			dstPoint.x = atoi(properties["destX"].asCString());
 			dstPoint.y = atoi(properties["destY"].asCString());
@@ -182,19 +183,26 @@ MainGame_GameScene::loadMap_(const std::string& mapFile)
 			entities_.push_back(std::move(transportEvent));
 
 		} else if (eventName == "deadlyFloor") {
-			SDL_Rect eventPosRect;
 			std::unique_ptr<DeadlyFloor> deadlyFloor;
-
-			eventPosRect.x = event["x"].asInt();
-			eventPosRect.y = event["y"].asInt();
-			eventPosRect.w = event["width"].asInt();
-			eventPosRect.h = event["height"].asInt();
 
 			deadlyFloor.reset(new DeadlyFloor(graphics_,
 							  eventPosRect,
 							  player_));
 
 			entities_.push_back(std::move(deadlyFloor));
+
+		} else if (eventName == "mapChangeEvent") {
+			std::unique_ptr<MapChangeEvent> mapChangeEvent;
+			const Json::Value& properties = event["properties"];
+			const std::string& mapFile =
+				properties["mapFile"].asString();
+
+			mapChangeEvent.reset(new MapChangeEvent(eventPosRect,
+								mapFile,
+								player_,
+								*this));
+
+			entities_.push_back(std::move(mapChangeEvent));
 
 		} else {
 			std::string warnMsg;

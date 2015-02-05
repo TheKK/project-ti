@@ -34,7 +34,7 @@ public:
 	virtual void update(const Controller& controller) override;
 	virtual void render() override;
 
-	void changeMap(const std::string& mapFile);
+	void changeMap(const std::string mapFile);
 	void popEventScript();
 private:
 	enum PlayingState
