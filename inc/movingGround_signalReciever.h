@@ -10,12 +10,14 @@
 
 #include "signalReceiver.h"
 
+/* TODO Create cpp file */
 class MovingGraound_signalReciever : public SignalReceiver
 {
 public:
 	MovingGraound_signalReciever(Graphics& graphics,
 				     const SDL_Rect& posRect):
-		groundSprite_(graphics, "sewer.png", SDL_Rect({0, 0, 16, 16})),
+		groundSprite_(graphics, "./assets/images/sewer.png",
+			      SDL_Rect({0, 0, 16, 16})),
 		posRect_(posRect)
 	{
 	}

@@ -14,8 +14,8 @@
 namespace
 {
 	const std::vector<std::string> kGameMaps = {
-		"map.json",
-		"newMap.json"
+		"./assets/map/map.json",
+		"./assets/map/newMap.json"
 	};
 
 	const int kCameraWidth = 150;

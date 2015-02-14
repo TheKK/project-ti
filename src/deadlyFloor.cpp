@@ -8,7 +8,7 @@ namespace
 	const int kFloorWidth = 16;
 	const int kFloorHeight = 16;
 
-	const std::string kSpriteName = "deadlyFloor.png";
+	const std::string kSpriteName = "./assets/images/deadlyFloor.png";
 	const SDL_Rect kSpriteClipRect = {0, 0, kFloorWidth, kFloorHeight};
 }
 

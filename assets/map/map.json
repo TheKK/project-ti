@@ -87,8 +87,23 @@
                  "type":"player",
                  "visible":true,
                  "width":10,
-                 "x":260,
-                 "y":450
+                 "x":370,
+                 "y":390
+                }, 
+                {
+                 "height":10,
+                 "id":5,
+                 "name":"mapChangeEvent",
+                 "properties":
+                    {
+                     "mapFile":"./assets/map/newMap.json"
+                    },
+                 "rotation":0,
+                 "type":"event",
+                 "visible":true,
+                 "width":10,
+                 "x":420,
+                 "y":390
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -121,7 +136,7 @@
          "x":0,
          "y":0
         }],
- "nextobjectid":5,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "properties":
     {
@@ -132,7 +147,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "image":"testTile.png",
+         "image":"./assets/images/testTile.png",
          "imageheight":10,
          "imagewidth":20,
          "margin":0,
@@ -147,7 +162,7 @@
         }, 
         {
          "firstgid":3,
-         "image":"four.png",
+         "image":"./assets/images/four.png",
          "imageheight":20,
          "imagewidth":20,
          "margin":0,
@@ -162,7 +177,7 @@
         }, 
         {
          "firstgid":7,
-         "image":"cave.png",
+         "image":"./assets/images/cave.png",
          "imageheight":16,
          "imagewidth":16,
          "margin":0,

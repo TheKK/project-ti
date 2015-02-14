@@ -13,7 +13,7 @@ namespace
 	const int kPlayerWidth = 10;
 	const int kPlayerHeight = 10;
 
-	const std::string kSpriteName = "standSprite.png";
+	const std::string kSpriteName = "./assets/images/standSprite.png";
 
 	const float kMoveMaxSpeedX = 2.5f;
 
