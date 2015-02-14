@@ -1,31 +1,26 @@
-CXX = g++
-CXX_FLAGS = -std=c++11 -g -Wall
+CXX := g++
 
-SRC_DIR = src
-INC_DIR = inc
-OUT_DIR = out
+SRC_DIR := src
+INC_DIR := inc
+OBJ_DIR := out
 
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-INCS = $(addprefix -I, $(INC_DIR))
-OBJS = $(addprefix $(OUT_DIR)/, $(SRCS:.cpp=.o))
-DEPS = $(SRCS:.cpp=.d)
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES := $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o))
+DEP_FILES := $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.d))
 
-LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf -ljsoncpp
+LDLIBS := -lSDL2 -lSDL2_image -lSDL2_ttf -ljsoncpp
+LDFLAGS :=
 
-OUT_EXE = map
+CXXFLAGS := -std=c++11 -g -Wall -MMD -MP -I $(INC_DIR)
 
-$(OUT_EXE): $(OBJS)
-	@echo "[LD]	$(notdir $@)"
-	@$(CXX) $^ $(CXX_FLAGS) $(LIBS) -o $@
+EXECUTABLE := map
 
-$(OUT_DIR)/%.o: %.cpp
-	@echo "[CXX]	$(notdir $@)"
-	@mkdir -p $(dir $@)
-	@$(CXX) $^ $(CXX_FLAGS) $(INCS) -c -o $@
+# Command
+.PHONY: all clean todo
+all: $(EXECUTABLE)
 
-.PHONY: clean
 clean:
-	@rm -frv $(OBJ) $(OUT_EXE)
+	@rm -frv $(OBJ_DIR) $(EXECUTABLE)
 
 todo:
 	@echo "[TODO]"
@@ -36,3 +31,17 @@ todo:
 	@echo
 	@echo "[XXX]"
 	@grep -r XXX .
+
+ifneq ($(MAKECMDGOALS), clean)
+-include $(DEP_FILES)
+endif
+
+# Recipes
+$(EXECUTABLE): $(OBJ_FILES)
+	@echo "[LD]	$(notdir $@)"
+	@$(CXX) $^ $(CXXFLAGS) $(LDLIBS) -o $@
+
+$(OBJ_DIR)/%.o: %.cpp
+	@echo "[CXX]	$(notdir $@)"
+	@mkdir -p $(dir $@)
+	@$(CXX) $< $(CXXFLAGS) -c -o $@
