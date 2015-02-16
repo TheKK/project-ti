@@ -15,7 +15,7 @@ CXXFLAGS := -std=c++11 -g -Wall -MMD -MP -I $(INC_DIR)
 
 EXECUTABLE := map
 
-# Command
+# Commands
 .PHONY: all clean todo
 all: $(EXECUTABLE)
 
