@@ -289,7 +289,7 @@ MainGame_GameScene::globalUpdate_(const Controller& controller)
 
 	if (controller.ifButtonPressed(BUTTON_R)) {
 		++currentMap_;
-		if (currentMap_ == kGameMaps.size())
+		if (currentMap_ == (int) kGameMaps.size())
 			currentMap_ = 0;
 		cleanMap_();
 		loadMap_(kGameMaps[currentMap_]);
